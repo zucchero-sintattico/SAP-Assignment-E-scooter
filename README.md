@@ -20,9 +20,9 @@
 
 - **E-Scooter Station Management**: Administrators should be able to manage e-scooter stations, including adding, removing, or relocating them.
 
-- **Reporting Issues or Incidents**: Users should be able to report issues or incidents related to e-scooters, which administrators can review and resolve.
-
 - **User Billing and Payments**: The system should calculate fares and handle payments for users.
+
+![Use Cases](/img/e-scooter-UseCase.png)
 
 ## User Stories
 - *As a user*, I want to register for the service using my email and password, so I can start using e-scooters.
