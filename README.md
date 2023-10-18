@@ -39,11 +39,9 @@
 
 - *As a user*, I want to view my ride history and receipts for tracking my usage.
 
-- *As a user*, I want to report an issue with an e-scooter when I encounter problems.
+- *As an admin*, I want to analyze the usage patterns of e-scooters to optimize their distribution and maintenance.
 
-- *As an admin*, I want to track the location and status of all e-scooters for management purposes.
-
-- *As an admin*, I want to monitor the battery status of e-scooters to ensure their availability.
+- *As an admin*, I want to automate maintenance tasks, including charging and repairing e-scooters.
 
 - *As an admin*, I want to track user activity and history for administrative purposes.
 
@@ -52,13 +50,15 @@
 
 - *Ride Lifecycle*: Users find, reserve, unlock, ride, and lock e-scooters, completing the ride cycle.
 
+- *Nearest E-Scooter flow*: Users searches for the nearest e-scooter available closest to his currest location.
+
 - *Maintenance Workflow*: The system automates the collection, charging, and repair of e-scooters to keep them in good condition.
+
+- *Monitoring Service Usage*: Users view the history of trips taken, including details such as the duration of trips and associated costs.
 
 - *Station Management*: Administrators can manage e-scooter stations, including adding, removing, or relocating them.
 
 - *User Account Management*: Users can update their profiles and reset their passwords as needed.
-
-- *Reporting and Issue Resolution*: Users report issues, administrators review them, and take action to resolve problems.
 
 - *Billing and Payment Processing*: The system calculates fares and handles payments for users.
 
@@ -72,8 +72,6 @@
 - *Station Management Events*: Events cover Station Added, Station Removed, and Station Relocated actions.
 
 - *User Account Management Events*: Events include Profile Update and Password Reset.
-
-- *Issue Reporting and Resolution Events*: Events consist of Issue Report, Review, and Resolution steps.
 
 - *Billing and Payment Events*: Events involve Fare Calculation and Payment Process stages.
 
