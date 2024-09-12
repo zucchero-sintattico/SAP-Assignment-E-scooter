@@ -25,67 +25,56 @@
 ![Use Cases](/img/e-scooter-UseCase.png)
 
 ## User Stories
-- *As a user*, I want to register for the service using my email and password, so I can start using e-scooters.
+- *As a user*, *I want* to register for the service using my email and password *so that* I can start using e-scooters.
 
-- *As a user*, I want to log in to my account securely to access the service.
+- *As a user*, *I want* to log in to my account securely *so that* I can access the service.
 
-- *As a user*, I want to find the nearest available e-scooter using the app.
+- *As a user*, *I want* to find the nearest available e-scooter using the app *so that* I can quickly start my ride.
 
-- *As a user*, I want to reserve an e-scooter for a specific time to ensure its availability.
+- *As a user*, *I want* to reserve an e-scooter for a specific time *so that* I can ensure its availability when I need it.
 
-- *As a user*, I want to unlock an e-scooter using the app when I'm ready to start my ride.
+- *As a user*, *I want* to unlock an e-scooter using the app *so that* I can start my ride easily and efficiently.
 
-- *As a user*, I want to end my ride and lock the e-scooter securely when I'm finished.
+- *As a user*, *I want* to end my ride and lock the e-scooter securely *so that* I can complete my trip and avoid additional charges.
 
-- *As a user*, I want to view my ride history and receipts for tracking my usage.
+- *As a user*, *I want* to view my ride history and receipts *so that* I can track my usage and expenses.
 
-- *As an admin*, I want to analyze the usage patterns of e-scooters to optimize their distribution and maintenance.
+- *As an admin*, *I want* to analyze the usage patterns of e-scooters *so that* I can optimize their distribution and maintenance.
 
-- *As an admin*, I want to automate maintenance tasks, including charging and repairing e-scooters.
+- *As an admin*, *I want* to automate maintenance tasks, including charging and repairing e-scooters *so that* the fleet remains operational with minimal manual intervention.
 
-- *As an admin*, I want to track user activity and history for administrative purposes.
+- *As an admin*, *I want* to track user activity and history *so that* I can monitor the system for administrative and reporting purposes.
 
 ## Domain Stories
-- *Registration Flow*: Users sign up, verify their email, and set a password to create their account.
 
-- *Ride Lifecycle*: Users find, reserve, unlock, ride, and lock e-scooters, completing the ride cycle.
-
-- *Nearest E-Scooter flow*: Users searches for the nearest e-scooter available closest to his currest location.
-
-- *Maintenance Workflow*: The system automates the collection, charging, and repair of e-scooters to keep them in good condition.
-
-- *Monitoring Service Usage*: Users view the history of trips taken, including details such as the duration of trips and associated costs.
-
-- *Station Management*: Administrators can manage e-scooter stations, including adding, removing, or relocating them.
-
-- *User Account Management*: Users can update their profiles and reset their passwords as needed.
-
-- *Billing and Payment Processing*: The system calculates fares and handles payments for users.
-
-## Event Storms
-- *User Registration Flow*: Events include Registration, Verification, and Password Set.
-
-- *Ride Lifecycle Events*: Events involve Reservation, Unlock, Ride, and Lock actions.
-
-- *Maintenance Workflow Events*: Events encompass Collection, Charging, and Repair processes.
-
-- *Station Management Events*: Events cover Station Added, Station Removed, and Station Relocated actions.
-
-- *User Account Management Events*: Events include Profile Update and Password Reset.
-
-- *Billing and Payment Events*: Events involve Fare Calculation and Payment Process stages.
+![Domain Stories](/img/e-scooter-Domain-stories.png)
 
 ## Quality Attribute Scenarios
-- **Performance**: The system must support concurrent user activity, ensuring quick e-scooter reservations and unlocks even during peak hours.
+Feature: Quick response time for finding the nearest e-scooter
 
-- **Security**: User data and payment information must be stored securely, and only authenticated users should have access to e-scooters.
+when a user searches for the nearest e-scooter\
+caused by a user using the mobile app\
+occurs in the search function of the mobile application\
+operating in normal operation with a high number of users\
+then the system processes the request and returns results\
+so that the search results are displayed within 2 seconds
 
-- **Scalability**: The system should easily scale as more e-scooters and users are added, accommodating growing demand.
+\
+Feature: High availability of authentication service
 
-- **Reliability**: E-scooter availability and the accuracy of tracking data should be highly reliable to maintain user trust.
+when a server responsible for user authentication fails\
+caused by server downtime or crash\
+occurs in the authentication module\
+operating in normal operation\
+then the system redirects authentication requests to a backup server\
+so that users can log in without downtime
 
-- **Usability**: The user app and company dashboard should be user-friendly and intuitive to ensure a positive user experience.
+\
+Feature: Small Latency in the case of overload
 
-- **Maintainability**: The system should be easy to maintain and update, and e-scooters should be efficiently serviced to minimize downtime.
-
-- **Integration**: The system should seamlessly integrate with payment gateways, mapping services, and e-scooter hardware for tracking and unlocking, ensuring a cohesive user experience.
+when multiple requests initiated in k seconds interval cause overload\
+caused by n users\
+occur in the system\
+operating in normal operation\
+then the system processes all requests\
+so that the average latency < m seconds
