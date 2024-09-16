@@ -47,7 +47,7 @@
 
 ## Domain Stories
 
-![Domain Stories](/img/e-scooter-Domain-stories.png)
+![Domain Stories](img/e-scooter-Domain-stories.png)
 
 ## Quality Attribute Scenarios
 Feature: Quick response time for finding the nearest e-scooter
