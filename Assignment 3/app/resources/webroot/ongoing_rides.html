@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>EScooterSystem - Ongoing Rides Dashboard</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <h2>EScooterSystem - Ongoing Rides Dashboard</h2>
+    <p id="numberOfOngoingRides"></p>
+    <button id="refresh">Refresh</button>
+    <script>
+        function getData(url = "") {
+            return $.ajax({
+                url: url,
+                type: 'GET',
+                dataType: 'json',
+            });
+        }
+        $("#refresh").click(function () {
+            getData("http://localhost:8080/api/rides/ongoing").done(function (reply) {
+                if (reply.result == 'ok') {
+                    $("#numberOfOngoingRides").text("Number of ongoing rides: " + reply.numberOfOngoingRides);
+                } else {
+                    $("#numberOfOngoingRides").text("Error fetching data.");
+                }
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                $("#numberOfOngoingRides").text("Request failed: " + textStatus + ", " + errorThrown);
+            });
+        });
+        // Fetch data when the page loads
+        $("#refresh").click();
+    </script>
+</body>
+
+</html>

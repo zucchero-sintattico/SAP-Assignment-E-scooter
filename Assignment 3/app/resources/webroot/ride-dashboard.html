@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>EScooterSystem - Ride Dashboard</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+  <h2>EScooterSystem - Ride Dashboard</h2>
+
+  <p>
+    <label>User id:</label><br>
+    <input type="text" id="userId" value="aricci303"><br><br>
+    <label>EScooter id:</label><br>
+    <input type="text" id="escooterId" value="escooter-01"><br><br>
+    <button id="startRide">Start Ride</button> <br>
+  <p id="startRideResult"></p>
+  </p>
+  <br><br>
+  <p>
+    <label>Ride id:</label><br>
+    <input type="text" id="rideId"><br><br>
+    <button id="endRide">End Ride</button> <br>
+  <p id="endRideResult"></p>
+  </p>
+
+  <script>
+    function postData(url = "", data = {}) {
+      return $.ajax({
+        url: url,
+        type: 'POST',
+        dataType: 'json',
+        contentType: 'application/json',
+        data: JSON.stringify(data)
+      });
+    }
+
+    $("#startRide").click(function() {
+      postData("http://localhost:8080/api/rides", {
+        userId: $("#userId").val(),
+        escooterId: $("#escooterId").val(),
+      }).done(function(reply) {
+        if (reply.result == 'ok') {
+          $("#startRideResult").text("OK - ride id " + reply.rideId);
+        } else {
+          $("#startRideResult").text("NOT OK.");
+        }
+      });
+    });
+
+    $("#endRide").click(function() {
+      postData("http://localhost:8080/api/rides/" + $("#rideId").val() + "/end", {})
+      .done(function(reply) {
+        if (reply.result == 'ok') {
+          $("#endRideResult").text("OK - ride ended. ");
+        } else {
+          $("#endRideResult").text("NOT OK.");
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>
