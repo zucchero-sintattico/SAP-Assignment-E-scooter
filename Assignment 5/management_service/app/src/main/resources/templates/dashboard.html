@@ -4,36 +4,61 @@
     <title>Management Service</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-top: 30px;
+        }
+        h1 {
+            color: #4a90e2;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .btn {
+            width: 100%;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
 <div class="container mt-3">
-    <h1>Welcome to Management service</h1>
+    <h1>Welcome to Management Service</h1>
 
-    <!-- Aggiungi due input per ID e location -->
+    <!-- Input per E-Scooter Name -->
     <div class="form-group">
         <label for="escooterName">E-Scooter Name:</label>
         <input type="text" class="form-control" id="escooterName" placeholder="Enter Name">
     </div>
+    <!-- Input per E-Scooter Location -->
     <div class="form-group">
         <label for="escooterLocation">E-Scooter Location:</label>
         <input type="text" class="form-control" id="escooterLocation" placeholder="Enter Location">
     </div>
 
     <!-- Bottone per creare E-scooter -->
-    <button class="btn btn-primary" onclick="createScooter()">Create E-scooter</button>
+    <button class="btn btn-primary" onclick="createScooter()">Create E-Scooter</button>
 
-    <!-- Altri elementi rimangono invariati -->
+    <!-- Dropdown per selezionare E-scooter -->
     <div class="form-group">
-        <label for="escooterDropdown">Select E-scooter to manage:</label>
+        <label for="escooterDropdown">Select E-Scooter to manage:</label>
         <select class="form-control" id="escooterDropdown">
             <!-- Options will be added here dynamically -->
         </select>
     </div>
+    <!-- Bottone per cambiare lo stato di riparazione -->
     <button class="btn btn-warning" onclick="toggleRepairState()">Toggle Repair State</button>
-    <button class="btn btn-secondary" onclick="window.location.href='/'">Go back
-    </button>
+    <!-- Bottone per tornare indietro -->
+    <button class="btn btn-secondary" onclick="window.location.href='/'">Go Back</button>
 </div>
-</body>
+
 <script>
     // Get the dropdown and the toggle button
     const dropdown = document.getElementById('escooterDropdown');
@@ -137,7 +162,7 @@
 
                 // Change the button text based on the new state
                 toggleButton.text(newState === "ready" ? "Toggle Repair State" : "Make it available");
-        
+
                 $.ajax({
                     url: `/api/management/set_scooter_state/${selectedScooterId}`,
                     type: 'PUT',
@@ -182,27 +207,5 @@
         });
     });
 </script>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: #f0f0f0;
-    }
-
-    .container {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    h1 {
-        color: #333;
-    }
-
-    button, select, label, input {
-        margin: 10px 0;
-        padding: 10px;
-    }
-</style>
+</body>
 </html>

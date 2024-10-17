@@ -2,20 +2,60 @@
 <html lang="en">
 <head>
     <title>Login Form</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa; /* Colore di sfondo chiaro */
+            font-family: Arial, sans-serif; /* Font family */
+        }
+
+        .container {
+            max-width: 400px; /* Larghezza massima del contenitore */
+            margin: 100px auto; /* Centra il contenitore verticalmente e orizzontalmente */
+            padding: 20px; /* Padding interno */
+            background-color: white; /* Colore di sfondo bianco */
+            border-radius: 10px; /* Angoli arrotondati */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Ombra per profondità */
+        }
+
+        h2 {
+            text-align: center; /* Allinea il titolo al centro */
+            color: #343a40; /* Colore del titolo */
+        }
+
+        label {
+            margin-top: 10px; /* Margine superiore per le etichette */
+        }
+
+        #message {
+            color: red; /* Colore del messaggio di errore */
+            text-align: center; /* Allinea il messaggio al centro */
+        }
+
+        .btn {
+            width: 100%; /* Pulsanti a larghezza intera */
+        }
+    </style>
 </head>
 <body>
-<h2>Login Form</h2>
 
-<form id="loginForm">
-    <label for="email">Email:</label><br>
-    <input type="email" id="email" name="email" required><br>
-    <label for="password">Password:</label><br>
-    <input type="password" id="password" name="password" required><br>
-    <input type="submit" value="Login">
-</form>
-<button id="homeButton" onclick="window.location.href='/api/users/dashboard'">Go to Home</button>
-<div id="message" style="color: red; display: none;"></div>
+<div class="container">
+    <h2>Login Form</h2>
+    <form id="loginForm">
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+        <input type="submit" class="btn btn-primary" value="Login">
+    </form>
+    <button id="homeButton" onclick="window.location.href='/api/users/dashboard'" class="btn btn-secondary mt-2">Go to Home</button>
+    <div id="message" style="display: none;"></div>
+</div>
 
 <script>
     $(document).ready(function () {

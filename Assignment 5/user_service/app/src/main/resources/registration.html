@@ -1,25 +1,68 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <title>Registration Form</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa; /* Colore di sfondo chiaro */
+            font-family: Arial, sans-serif; /* Font family */
+        }
+
+        .container {
+            max-width: 500px; /* Larghezza massima del contenitore */
+            margin: 100px auto; /* Centra il contenitore verticalmente e orizzontalmente */
+            padding: 20px; /* Padding interno */
+            background-color: white; /* Colore di sfondo bianco */
+            border-radius: 10px; /* Angoli arrotondati */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Ombra per profondità */
+        }
+
+        h2 {
+            text-align: center; /* Allinea il titolo al centro */
+            color: #343a40; /* Colore del titolo */
+        }
+
+        .form-check {
+            margin-top: 10px; /* Margine superiore per il checkbox */
+        }
+
+        #message {
+            text-align: center; /* Allinea il messaggio al centro */
+        }
+
+        .btn {
+            width: 100%; /* Pulsanti a larghezza intera */
+        }
+    </style>
 </head>
 <body>
-<h2>Registration Form</h2>
 
-<form id="registrationForm">
-    <label for="name">Name:</label><br>
-    <input type="text" id="name" name="name" required><br>
-    <label for="email">Email:</label><br>
-    <input type="email" id="email" name="email" required><br>
-    <label for="password">Password:</label><br>
-    <input type="password" id="password" name="password" required><br>
-    <label for="maintainer">Maintainer:</label><br>
-    <input type="checkbox" id="maintainer" name="maintainer" value="true"><br>
-    <input type="submit" value="Register">
-</form>
-<button id="homeButton" onclick="window.location.href='/api/users/dashboard'">Go to Home</button>
-<div id="message" style="color: red; display: none;"></div>
+<div class="container">
+    <h2>Registration Form</h2>
+    <form id="registrationForm">
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="maintainer" name="maintainer" value="true">
+            <label class="form-check-label" for="maintainer">Maintainer</label>
+        </div>
+        <input type="submit" class="btn btn-primary" value="Register">
+    </form>
+    <button id="homeButton" onclick="window.location.href='/api/users/dashboard'" class="btn btn-secondary mt-2">Go to Home</button>
+    <div id="message" style="color: red; display: none;"></div>
+</div>
 
 <script>
     $(document).ready(function () {
@@ -47,5 +90,6 @@
         });
     });
 </script>
+
 </body>
 </html>

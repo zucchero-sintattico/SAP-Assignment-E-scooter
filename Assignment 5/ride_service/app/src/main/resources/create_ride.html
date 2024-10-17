@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <title>Create a Ride</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
         $(document).ready(function () {
@@ -10,53 +11,92 @@
                 type: 'GET',
                 success: function (scooters) {
                     if (scooters.length > 0) {
-                        // Handle available scooters. For example, populate a dropdown:
-                        const dropdown = $('#scooterSelect'); // replace with your actual dropdown id
+                        const dropdown = $('#scooterSelect');
                         scooters.forEach(function (scooter) {
                             dropdown.append($('<option></option>').val(scooter.id).text(scooter.name));
                         });
                     } else {
-                        // Handle no available scooters. For example, show an error message:
                         alert('No available scooters');
-                        // Then redirect back to the previous page:
                         window.history.back();
                     }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     if (jqXHR.status === 503) {
-                        // The Circuit Breaker might be open
-                        //window.location.href = 'circuit_breaker_open.html';
+                        // Handle Circuit Breaker
                     } else {
-                        // Handle other errors
                         alert('An error occurred: ' + textStatus);
                     }
                 }
             });
         });
     </script>
+    <style>
+        body {
+            background-color: #f8f9fa; /* Colore di sfondo chiaro */
+            font-family: Arial, sans-serif; /* Font family */
+            text-align: center; /* Centra il testo */
+        }
+
+        h2 {
+            margin-top: 50px; /* Margine superiore per il titolo */
+            color: #343a40; /* Colore del titolo */
+        }
+
+        .form-container {
+            margin: 20px auto; /* Centra il contenitore del modulo */
+            max-width: 500px; /* Larghezza massima del modulo */
+            padding: 20px; /* Padding interno */
+            background-color: #ffffff; /* Colore di sfondo del modulo */
+            border-radius: 8px; /* Angoli arrotondati */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Ombra per il contenitore */
+        }
+
+        .btn-custom {
+            width: 100%; /* Pulsanti a tutta larghezza */
+            margin-top: 10px; /* Margine superiore per i pulsanti */
+        }
+
+        #message {
+            margin-top: 20px; /* Margine superiore per il messaggio */
+        }
+    </style>
 </head>
 <body>
+
 <h2>Create a Ride</h2>
-<button onclick="history.back()">Go back</button>
-<form id="startRide" > <!--enctype="application/x-www-form-urlencoded"-->
-    <label for="scooterSelect">Select a Scooter:</label><br>
-    <select id="scooterSelect" name="scooterId" required></select><br>
-    <label for="startLocation">Start Location:</label><br>
-    <input type="text" id="startLocation" name="startLocation" required><br>
-    <label for="endLocation">End Location:</label><br>
-    <input type="text" id="endLocation" name="endLocation" required><br>
-    <label for="startTime">Start Time:</label><br>
-    <input type="datetime-local" id="startTime" name="startTime" required><br>
-    <label for="endTime">End Time:</label><br>
-    <input type="datetime-local" id="endTime" name="endTime" required><br>
-    <input type="submit" value="Create Ride">
-</form>
-<div id="message" style="color: red; display: none;"></div>
+<button class="btn btn-secondary" onclick="history.back()">Go back</button>
+
+<div class="form-container">
+    <form id="startRide">
+        <div class="form-group">
+            <label for="scooterSelect">Select a Scooter:</label>
+            <select id="scooterSelect" name="scooterId" class="form-control" required></select>
+        </div>
+        <div class="form-group">
+            <label for="startLocation">Start Location:</label>
+            <input type="text" id="startLocation" name="startLocation" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="endLocation">End Location:</label>
+            <input type="text" id="endLocation" name="endLocation" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="startTime">Start Time:</label>
+            <input type="datetime-local" id="startTime" name="startTime" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="endTime">End Time:</label>
+            <input type="datetime-local" id="endTime" name="endTime" class="form-control" required>
+        </div>
+        <input type="submit" value="Create Ride" class="btn btn-primary btn-custom">
+    </form>
+    <div id="message" style="color: red; display: none;"></div>
+</div>
 
 <script>
     $(document).ready(function () {
         $('#startRide').on('submit', function (event) {
-            event.preventDefault(); // Prevent the form from submitting
+            event.preventDefault();
 
             $.ajax({
                 url: '/api/rides/create_ride',
@@ -65,11 +105,9 @@
                 success: function (response) {
                     $('#message').css('color', 'green').text('Ride created successfully! Wait 2 seconds...').show();
 
-                    // Redirect dopo un breve ritardo
                     setTimeout(function () {
-                        window.location.href = '/api/rides/get_rides'; // Reindirizza a get_rides
-                    }, 2000); // 2 secondi di attesa
-
+                        window.location.href = '/api/rides/get_rides';
+                    }, 2000);
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     console.error("Error status code:", jqXHR.status);
@@ -77,7 +115,7 @@
                 }
             });
         });
-    })
+    });
 </script>
 </body>
 </html>

@@ -2,28 +2,54 @@
 <html lang="en">
 <head>
     <title>User Service</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
+        body {
+            background-color: #f8f9fa; /* Background color */
+            font-family: Arial, sans-serif; /* Font family */
+        }
+
+        h2 {
+            color: #343a40; /* Dark gray color for the heading */
+            text-align: center; /* Center align heading */
+            margin-top: 20px; /* Margin at the top */
+        }
+
         .button-container {
             display: flex;
+            justify-content: center; /* Center buttons horizontally */
+            margin-top: 20px; /* Margin at the top */
         }
 
         .button-container button {
-            margin-right: 10px;
-            width: 100px; /* Set a fixed width for all buttons */
+            margin: 0 10px; /* Margin between buttons */
+            width: 120px; /* Set a fixed width for all buttons */
+            font-size: 16px; /* Font size */
+        }
+
+        .container {
+            max-width: 400px; /* Limit the width of the container */
+            margin: auto; /* Center container */
+            padding: 20px; /* Padding around the content */
+            background-color: white; /* White background for the container */
+            border-radius: 10px; /* Rounded corners */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Shadow effect */
         }
     </style>
 </head>
 <body>
-<h2>Welcome to the User Service!</h2>
-<div class="button-container">
-    <button id="loginButton" onclick="goToLogin()" style="display: none;">Login</button>
-    <button id="logoutButton" onclick="logout()" style="display: none;">Logout</button>
-    <button onclick="goToRegistration()">Register</button>
-    <button onclick="goToRides()">Go to Rides</button>
+<div class="container">
+    <h2>Welcome to the User Service!</h2>
+    <div class="button-container">
+        <button id="loginButton" onclick="goToLogin()" style="display: none;" class="btn btn-primary">Login</button>
+        <button id="logoutButton" onclick="logout()" style="display: none;" class="btn btn-danger">Logout</button>
+        <button onclick="goToRegistration()" class="btn btn-success">Register</button>
+        <button onclick="goToRides()" class="btn btn-info">Go to Rides</button>
+    </div>
 </div>
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
-
     function checkLoginStatus() {
         const emailCookie = document.cookie.split('; ').find(row => row.startsWith('email'));
         console.log(document.cookie.toString());
@@ -41,10 +67,10 @@
             url: '/api/users/auth/logout',
             type: 'DELETE',
             success: function (response) {
-                window.location.reload(); // Ricarica la pagina per riflettere lo stato di login aggiornato
+                window.location.reload(); // Reload the page to reflect updated login status
             },
             error: function (error) {
-                alert('Logout failed: ' + error.responseText); // Mostra un messaggio di errore
+                alert('Logout failed: ' + error.responseText); // Show error message
                 console.error('Logout failed:', error);
             }
         });

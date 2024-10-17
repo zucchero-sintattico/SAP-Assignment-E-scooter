@@ -2,6 +2,28 @@
 <html lang="en">
 <head>
     <title>Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa; /* Colore di sfondo chiaro */
+            font-family: Arial, sans-serif; /* Font family */
+            text-align: center; /* Centra il testo */
+        }
+
+        h2 {
+            margin-top: 50px; /* Margine superiore per il titolo */
+            color: #343a40; /* Colore del titolo */
+        }
+
+        .button-container {
+            margin-top: 30px; /* Margine superiore per i pulsanti */
+        }
+
+        .btn {
+            width: 200px; /* Larghezza dei pulsanti */
+            margin: 10px; /* Margine per i pulsanti */
+        }
+    </style>
     <script>
         function goToHome() {
             window.location.href = "/";
@@ -17,9 +39,14 @@
     </script>
 </head>
 <body>
+
 <h2>Welcome to the Rides Service!</h2>
-<button onclick="goToHome()">Go to Home</button>
-<button onclick="startRide()">Start a Ride</button>
-<button onclick="getRides()">Get Rides</button>
+
+<div class="button-container">
+    <button class="btn btn-primary" onclick="goToHome()">Go to Home</button>
+    <button class="btn btn-success" onclick="startRide()">Start a Ride</button>
+    <button class="btn btn-info" onclick="getRides()">Get Rides</button>
+</div>
+
 </body>
 </html>
