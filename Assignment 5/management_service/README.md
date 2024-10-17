@@ -39,9 +39,8 @@ This service manages e-scooters, allowing users to create new e-scooters, view a
           "location": "string",
           "state": "string"
         }
-    ]
-  ``` 
-  
+    ] 
+    ```
 ### 4. Get E-Scooter state
 - **URL:** `/api/management/get_scooter_state/:id`
 - **Method:** `GET`
