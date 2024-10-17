@@ -1,19 +1,59 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redirecting...</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #4a90e2;
+        }
+        .message {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .loader {
+            border: 10px solid #f3f3f3; /* Light grey */
+            border-top: 10px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
     <script type="text/javascript">
         function redirect() {
             setTimeout(function () {
                 // Retrieve current domain
                 const domain = window.location.hostname;
-                console.log(domain)
+                console.log(domain);
                 window.location.href = "http://" + domain + ":8080/" + "api/users/auth/login-form";
             }, 3000);
         }
     </script>
 </head>
 <body onload="redirect()">
-<h1>Redirecting you to the login page...</h1>
+<div class="message">
+    <h1>Redirecting you to the login page...</h1>
+    <div class="loader"></div>
+</div>
 </body>
 </html>

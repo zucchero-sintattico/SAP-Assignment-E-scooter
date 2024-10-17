@@ -1,14 +1,50 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Home</title>
-    </head>
-    <body>
-        <h1>Welcome to the E-Scooter website!</h1>
-        <button onclick="window.location.href='api/rides/dashboard'">Go to Rides Service</button>
-        <button onclick="window.location.href='api/users/dashboard'">Go to User Service</button>
-        <button id="maintenanceButton" onclick="window.location.href='/api/management/dashboard'">Go to Maintainer Service</button>
-    </body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #maintenanceButton {
+            display: none; /* Inizialmente nascosto */
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to the E-Scooter website!</h1>
+    <button onclick="window.location.href='api/rides/dashboard'">Go to Rides Service</button>
+    <button onclick="window.location.href='api/users/dashboard'">Go to User Service</button>
+    <button id="maintenanceButton" onclick="window.location.href='/api/management/dashboard'">Go to Maintainer Service</button>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
         function checkMaintainerStatus() {
@@ -32,4 +68,5 @@
             checkMaintainerStatus();
         });
     </script>
+</body>
 </html>

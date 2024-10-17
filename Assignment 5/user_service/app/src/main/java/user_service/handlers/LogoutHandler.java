@@ -20,6 +20,9 @@ public class LogoutHandler implements IHandler {
                 Cookie cookie = Cookie.cookie("email", "").setMaxAge(0).setPath("/").setDomain("localhost");
                 routingContext.response().addCookie(cookie);
 
+                Cookie maintainerCookie = Cookie.cookie("isMaintainer", "").setMaxAge(0).setPath("/").setDomain("localhost");
+                routingContext.response().addCookie(maintainerCookie);
+
                 System.out.println("[LogoutHandler] User logged out. Cookie deleted.");
                 promise.complete();
             } catch (Exception e) {
