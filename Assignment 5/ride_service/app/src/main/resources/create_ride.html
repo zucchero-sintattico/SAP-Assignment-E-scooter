@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Create a Ride</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: 'http://localhost:8080/api/management/available_scooters',
+                type: 'GET',
+                success: function (scooters) {
+                    if (scooters.length > 0) {
+                        // Handle available scooters. For example, populate a dropdown:
+                        const dropdown = $('#scooterSelect'); // replace with your actual dropdown id
+                        scooters.forEach(function (scooter) {
+                            dropdown.append($('<option></option>').val(scooter.id).text(scooter.name));
+                        });
+                    } else {
+                        // Handle no available scooters. For example, show an error message:
+                        alert('No available scooters');
+                        // Then redirect back to the previous page:
+                        window.history.back();
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    if (jqXHR.status === 503) {
+                        // The Circuit Breaker might be open
+                        //window.location.href = 'circuit_breaker_open.html';
+                    } else {
+                        // Handle other errors
+                        alert('An error occurred: ' + textStatus);
+                    }
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+<h2>Create a Ride</h2>
+<button onclick="history.back()">Go back</button>
+<form id="startRide" > <!--enctype="application/x-www-form-urlencoded"-->
+    <label for="scooterSelect">Select a Scooter:</label><br>
+    <select id="scooterSelect" name="scooterId" required></select><br>
+    <label for="startLocation">Start Location:</label><br>
+    <input type="text" id="startLocation" name="startLocation" required><br>
+    <label for="endLocation">End Location:</label><br>
+    <input type="text" id="endLocation" name="endLocation" required><br>
+    <label for="startTime">Start Time:</label><br>
+    <input type="datetime-local" id="startTime" name="startTime" required><br>
+    <label for="endTime">End Time:</label><br>
+    <input type="datetime-local" id="endTime" name="endTime" required><br>
+    <input type="submit" value="Create Ride">
+</form>
+<div id="message" style="color: red; display: none;"></div>
+
+<script>
+    $(document).ready(function () {
+        $('#startRide').on('submit', function (event) {
+            event.preventDefault(); // Prevent the form from submitting
+
+            $.ajax({
+                url: '/api/rides/create_ride',
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function (response) {
+                    $('#message').css('color', 'green').text('Ride created successfully! Wait 2 seconds...').show();
+
+                    // Redirect dopo un breve ritardo
+                    setTimeout(function () {
+                        window.location.href = '/api/rides/get_rides'; // Reindirizza a get_rides
+                    }, 2000); // 2 secondi di attesa
+
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error("Error status code:", jqXHR.status);
+                    $('#message').css('color', 'red').html('An error occurred: ' + jqXHR.responseText).show();
+                }
+            });
+        });
+    })
+</script>
+</body>
+</html>

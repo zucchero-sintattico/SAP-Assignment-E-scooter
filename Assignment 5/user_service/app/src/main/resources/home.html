@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>User Service</title>
+    <style>
+        .button-container {
+            display: flex;
+        }
+
+        .button-container button {
+            margin-right: 10px;
+            width: 100px; /* Set a fixed width for all buttons */
+        }
+    </style>
+</head>
+<body>
+<h2>Welcome to the User Service!</h2>
+<div class="button-container">
+    <button id="loginButton" onclick="goToLogin()" style="display: none;">Login</button>
+    <button id="logoutButton" onclick="logout()" style="display: none;">Logout</button>
+    <button onclick="goToRegistration()">Register</button>
+    <button onclick="goToRides()">Go to Rides</button>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+
+    function checkLoginStatus() {
+        const emailCookie = document.cookie.split('; ').find(row => row.startsWith('email'));
+        console.log(document.cookie.toString());
+        if (emailCookie) {
+            $('#loginButton').hide();
+            $('#logoutButton').show();
+        } else {
+            $('#loginButton').show();
+            $('#logoutButton').hide();
+        }
+    }
+
+    function logout() {
+        $.ajax({
+            url: '/api/users/auth/logout',
+            type: 'DELETE',
+            success: function (response) {
+                window.location.reload(); // Ricarica la pagina per riflettere lo stato di login aggiornato
+            },
+            error: function (error) {
+                alert('Logout failed: ' + error.responseText); // Mostra un messaggio di errore
+                console.error('Logout failed:', error);
+            }
+        });
+    }
+
+    function goToRegistration() {
+        window.location.href = '/api/users/register-form';
+    }
+
+    function goToLogin() {
+        window.location.href = "/api/users/auth/login-form";
+    }
+
+    function goToRides() {
+        window.location.href = "/api/rides/dashboard";
+    }
+
+    $(document).ready(function () {
+        checkLoginStatus();
+        window.goToLogin = goToLogin;
+        window.goToRegistration = goToRegistration;
+        window.logout = logout;
+        window.goToRides = goToRides;
+    });
+</script>
+</body>
+</html>

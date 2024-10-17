@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Login Form</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+<h2>Login Form</h2>
+
+<form id="loginForm">
+    <label for="email">Email:</label><br>
+    <input type="email" id="email" name="email" required><br>
+    <label for="password">Password:</label><br>
+    <input type="password" id="password" name="password" required><br>
+    <input type="submit" value="Login">
+</form>
+<button id="homeButton" onclick="window.location.href='/api/users/dashboard'">Go to Home</button>
+<div id="message" style="color: red; display: none;"></div>
+
+<script>
+    $(document).ready(function () {
+        $('#loginForm').on('submit', function (event) {
+            event.preventDefault(); // Evita il submit del modulo
+
+            $.ajax({
+                url: '/api/users/auth/login', // Utilizza l'endpoint RESTful
+                type: 'POST',
+                data: $(this).serialize(), // Invia i dati del modulo
+                success: function (response) {
+                    // Gestisci la risposta in caso di successo
+                    $('#message').css('color', 'green').text('Login successful! Wait 2 seconds...').show();
+
+                    // Redirect dopo un breve ritardo
+                    setTimeout(function () {
+                        window.location.href = '/api/users/dashboard'; // Reindirizza a /users
+                    }, 2000); // 2 secondi di attesa
+                },
+                error: function (xhr) {
+                    // Gestisci l'errore, mostra un messaggio
+                    alert('Login failed: ' + xhr.responseText);
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

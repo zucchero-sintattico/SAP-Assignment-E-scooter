@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Dashboard</title>
+    <script>
+        function goToHome() {
+            window.location.href = "/";
+        }
+
+        function startRide() {
+            window.location.href = "/api/rides/create-form";
+        }
+
+        function getRides() {
+            window.location.href = "/api/rides/get_rides";
+        }
+    </script>
+</head>
+<body>
+<h2>Welcome to the Rides Service!</h2>
+<button onclick="goToHome()">Go to Home</button>
+<button onclick="startRide()">Start a Ride</button>
+<button onclick="getRides()">Get Rides</button>
+</body>
+</html>

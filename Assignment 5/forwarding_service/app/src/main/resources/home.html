@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Home</title>
+    </head>
+    <body>
+        <h1>Welcome to the E-Scooter website!</h1>
+        <button onclick="window.location.href='api/rides/dashboard'">Go to Rides Service</button>
+        <button onclick="window.location.href='api/users/dashboard'">Go to User Service</button>
+        <button id="maintenanceButton" onclick="window.location.href='/api/management/dashboard'">Go to Maintainer Service</button>
+    </body>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        function checkMaintainerStatus() {
+            const cookies = document.cookie.split(';').map(cookie => cookie.trim());
+            const isMaintainerCookie = cookies.find(cookie => cookie.startsWith('isMaintainer='));
+
+            if (isMaintainerCookie) {
+                const isMaintainerValue = isMaintainerCookie.split('=')[1];
+                if (isMaintainerValue === 'true') {
+                    $('#maintenanceButton').show();
+                } else {
+                    $('#maintenanceButton').hide();
+                }
+            } else {
+                $('#maintenanceButton').hide();
+                console.log("Cookie 'isMaintainer' non trovato");
+            }
+        }
+
+        $(document).ready(function () {
+            checkMaintainerStatus();
+        });
+    </script>
+</html>

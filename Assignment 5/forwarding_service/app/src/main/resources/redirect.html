@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Redirecting...</title>
+    <script type="text/javascript">
+        function redirect() {
+            setTimeout(function () {
+                // Retrieve current domain
+                const domain = window.location.hostname;
+                console.log(domain)
+                window.location.href = "http://" + domain + ":8080/" + "api/users/auth/login-form";
+            }, 3000);
+        }
+    </script>
+</head>
+<body onload="redirect()">
+<h1>Redirecting you to the login page...</h1>
+</body>
+</html>

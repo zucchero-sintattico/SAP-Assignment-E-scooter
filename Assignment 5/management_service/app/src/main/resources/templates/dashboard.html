@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Management Service</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+<div class="container mt-3">
+    <h1>Welcome to Management service</h1>
+
+    <!-- Aggiungi due input per ID e location -->
+    <div class="form-group">
+        <label for="escooterName">E-Scooter Name:</label>
+        <input type="text" class="form-control" id="escooterName" placeholder="Enter Name">
+    </div>
+    <div class="form-group">
+        <label for="escooterLocation">E-Scooter Location:</label>
+        <input type="text" class="form-control" id="escooterLocation" placeholder="Enter Location">
+    </div>
+
+    <!-- Bottone per creare E-scooter -->
+    <button class="btn btn-primary" onclick="createScooter()">Create E-scooter</button>
+
+    <!-- Altri elementi rimangono invariati -->
+    <div class="form-group">
+        <label for="escooterDropdown">Select E-scooter to manage:</label>
+        <select class="form-control" id="escooterDropdown">
+            <!-- Options will be added here dynamically -->
+        </select>
+    </div>
+    <button class="btn btn-warning" onclick="toggleRepairState()">Toggle Repair State</button>
+    <button class="btn btn-secondary" onclick="window.location.href='/'">Go back
+    </button>
+</div>
+</body>
+<script>
+    // Get the dropdown and the toggle button
+    const dropdown = document.getElementById('escooterDropdown');
+    const toggleButton = document.querySelector('.btn-warning');
+
+    dropdown.addEventListener('change', async function () {
+        const selectedScooterId = dropdown.value;
+
+        try {
+            // Get the current state of the selected scooter
+            const currentStateResponse = await fetch(`/api/management/get_scooter_state/${selectedScooterId}`);
+            const currentState = await currentStateResponse.json();
+
+            // Change the button text based on the scooter's state
+            toggleButton.textContent = currentState.state === "in use" ? "Make it available" : "Toggle Repair State";
+        } catch (error) {
+            console.error('An error occurred:', error);
+        }
+    });
+
+    function createScooter() {
+        const scooterName = $('#escooterName').val();
+        const scooterLocation = $('#escooterLocation').val();
+
+        // Validate form inputs
+        if (!scooterName || !scooterLocation) {
+            alert('Please enter a name and location for the e-scooter');
+            return;
+        }
+
+        $.ajax({
+            url: '/api/management/create_escooter',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                name: scooterName,
+                location: scooterLocation,
+                state: "ready"
+            }),
+            success: function (response) {
+                alert('E-Scooter created successfully!');
+                location.reload();
+            },
+            error: function (error) {
+                alert('An error occurred while creating the e-scooter: ' + error);
+            }
+        });
+    }
+
+    function populateScooterDropdown() {
+        $.ajax({
+            url: '/api/management/all_scooters',
+            type: 'GET',
+            success: function (scooters) {
+                const dropdown = $('#escooterDropdown');
+                scooters.forEach((scooter) => {
+                    dropdown.append(new Option(scooter.name, scooter.id));
+                });
+
+                // Set the button text for the first scooter in the dropdown
+                if (scooters.length > 0) {
+                    const firstScooterId = scooters[0].id;
+                    $.ajax({
+                        url: `/api/management/get_scooter_state/${firstScooterId}`,
+                        type: 'GET',
+                        success: function (response) {
+                            const currentState = response.state;
+                            const toggleButton = $('.btn-warning');
+                            let buttonText;
+                            if (currentState === "ready") {
+                                buttonText = "Toggle Repair State";
+                            } else {
+                                buttonText = "Make it available";
+                            }
+                            toggleButton.text(buttonText);
+                        },
+                        error: function (error) {
+                            console.error('An error occurred while getting the e-scooter state:', error);
+                        }
+                    });
+                }
+            },
+            error: function (error) {
+                console.error('An error occurred while populating the dropdown:', error);
+            }
+        });
+    }
+
+    function toggleRepairState() {
+        const dropdown = $('#escooterDropdown');
+        const selectedScooterId = dropdown.val();
+        const toggleButton = $('.btn-warning'); // select the toggle button
+
+        $.ajax({
+            url: `/api/management/get_scooter_state/${selectedScooterId}`,
+            type: 'GET',
+            success: function (response) {
+                const currentState = response.state;
+                // Toggle the state from "ready" to "repair" or vice versa
+                const newState = currentState === "ready" ? "repair" : "ready";
+
+                // Change the button text based on the new state
+                toggleButton.text(newState === "ready" ? "Toggle Repair State" : "Make it available");
+        
+                $.ajax({
+                    url: `/api/management/set_scooter_state/${selectedScooterId}`,
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        state: newState
+                    }),
+                    success: function (response) {
+                        location.reload();
+                    },
+                    error: function (error) {
+                        console.error('An error occurred while updating the e-scooter state:', error);
+                    }
+                });
+            },
+            error: function (error) {
+                console.error('An error occurred while getting the e-scooter state:', error);
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        populateScooterDropdown();
+
+        $('#escooterDropdown').change(function () {
+            const selectedScooterId = $(this).val();
+
+            console.log("Event listener triggered with value: ", selectedScooterId);
+
+            $.ajax({
+                url: `/api/management/get_scooter_state/${selectedScooterId}`,
+                type: 'GET',
+                success: function (response) {
+                    const currentState = response.state;
+                    const toggleButton = $('.btn-warning');
+                    toggleButton.text(currentState === "in use" ? "Make it available" : "Toggle Repair State");
+                },
+                error: function (error) {
+                    console.error('An error occurred while getting the e-scooter state:', error);
+                }
+            });
+        });
+    });
+</script>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f0f0f0;
+    }
+
+    .container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    h1 {
+        color: #333;
+    }
+
+    button, select, label, input {
+        margin: 10px 0;
+        padding: 10px;
+    }
+</style>
+</html>
