@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
-
 import java.util.Collections;
 import java.util.List;
 
@@ -70,7 +69,8 @@ public class EScooterController {
                             .put("state", state);
                     return ResponseEntity.ok(responseJson);
                 } else {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(objectMapper.createObjectNode().put("error", "Scooter not found"));
+                    throw new RuntimeException("Scooter not found");
+                    //return ResponseEntity.status(HttpStatus.NOT_FOUND).body(objectMapper.createObjectNode().put("error", "Scooter not found"));
                 }
             });
         } catch (Exception e) {
@@ -98,7 +98,8 @@ public class EScooterController {
                 if (scooter != null) {
                     return ResponseEntity.ok("Scooter state updated successfully");
                 } else {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Scooter not found");
+                    throw new RuntimeException("Scooter not found");
+                    //return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Scooter not found");
                 }
             });
         } catch (Exception e) {
@@ -116,7 +117,8 @@ public class EScooterController {
                     return ResponseEntity.ok("Scooter is now in use");
                 } else {
                     logger.warn("Scooter with id {} is not available or not found", scooterId);
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Scooter is not available or not found");
+                    throw new RuntimeException("Scooter not found or is not available" );
+                    //return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Scooter is not available or not found");
                 }
             });
         } catch (HttpClientErrorException e) {
