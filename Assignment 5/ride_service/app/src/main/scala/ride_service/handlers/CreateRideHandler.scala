@@ -74,7 +74,7 @@ class CreateRideHandler(databaseClient: IDbClient, circuitBreaker: CircuitBreake
           .putHeader(HttpHeaders.CONTENT_TYPE, "application/json")
           .end(Json.encode("Ride created successfully!"))
       } else {
-        routingContext.response().setStatusCode(503).putHeader(HttpHeaders.CONTENT_TYPE, "application/json").end(Json.encode("Error: " + ar.cause().getMessage))
+        routingContext.response().setStatusCode(503).putHeader(HttpHeaders.CONTENT_TYPE, "application/json").end("Error: " + ar.cause().getMessage)
       }
     })
   }

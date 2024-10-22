@@ -4,7 +4,6 @@
  * This generated file contains a sample Java application project to get you started.
  * For more details on building Java & JVM projects, please refer to https://docs.gradle.org/8.5/userguide/building_java_projects.html in the Gradle documentation.
  */
-
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     id("org.springframework.boot") version "3.2.1"
@@ -23,14 +22,12 @@ repositories {
 }
 
 dependencies {
-    // Use JUnit test framework.
     testImplementation(libs.junit)
 
-    // This dependency is used by the application.
     implementation(libs.guava)
 
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-data-mongodb:3.2.2")
+    implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
     implementation("io.github.resilience4j:resilience4j-spring-boot3:2.2.0")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-aop")

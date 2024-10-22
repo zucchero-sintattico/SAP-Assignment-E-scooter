@@ -68,48 +68,4 @@ public class ManagementServiceRoute {
             return Mono.error(e);
         }
     }
-
-    /*private Mono<Void> applyFilter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        var request = exchange.getRequest();
-        logger.info("Forwarding request: {} {}", request.getMethod(), request.getURI());
-
-        // Check if the user is maintainer for non-PUT requests
-        if (request.getMethod() != HttpMethod.PUT && !isMaintainer(exchange)) {
-            logger.info("User is not a maintainer. Redirecting to login.");
-            return redirectToLogin(exchange);
-        }
-
-        return Mono.fromRunnable(() ->
-                circuitBreaker.executeSupplier(() -> chain.filter(exchange))
-        ).onErrorResume(throwable -> handleCircuitBreakerError(exchange)).then();
-    }
-
-    private boolean isMaintainer(ServerWebExchange exchange) {
-        return Optional.ofNullable(exchange.getRequest().getCookies().getFirst("isMaintainer")).isPresent();
-    }
-
-    private Mono<Void> redirectToLogin(ServerWebExchange exchange) {
-        return sendHtmlResponse(exchange);
-    }
-
-    private Mono<Void> handleCircuitBreakerError(ServerWebExchange exchange) {
-        logger.error("Circuit Breaker is open. Service unavailable.");
-        exchange.getResponse().setStatusCode(HttpStatus.SERVICE_UNAVAILABLE);
-        return exchange.getResponse().setComplete();
-    }
-
-    private Mono<Void> sendHtmlResponse(ServerWebExchange exchange) {
-        try {
-            var htmlContent = new ClassPathResource("redirect.html")
-                    .getInputStream()
-                    .readAllBytes();
-            exchange.getResponse().getHeaders().setContentType(MediaType.TEXT_HTML);
-            return exchange.getResponse().writeWith(
-                    Mono.just(exchange.getResponse().bufferFactory().wrap(htmlContent))
-            );
-        } catch (Exception e) {
-            logger.error("Failed to load HTML content: " + "redirect.html", e);
-            return Mono.error(e);
-        }
-    }*/
 }
