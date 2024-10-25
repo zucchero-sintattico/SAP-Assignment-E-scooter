@@ -19,6 +19,10 @@ dependencies {
     // Use JUnit test framework.
     testImplementation(libs.junit)
 
+    // Vert.x
+    implementation("io.vertx:vertx-core:4.5.3")
+    implementation("io.vertx:vertx-web:4.4.5")
+
     // This dependency is used by the application.
     implementation(libs.guava)
 }
