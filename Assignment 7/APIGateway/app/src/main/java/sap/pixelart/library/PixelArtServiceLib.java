@@ -11,8 +11,8 @@ package sap.pixelart.library;
  */
 public class PixelArtServiceLib {
 
-	private final String DEFAULT_HOST = "localhost";
-	private final int DEFAULT_PORT = 9000;
+	private static final String DEFAULT_HOST = "localhost";
+	private static final int DEFAULT_PORT = 9000;
 	
 	private static PixelArtServiceLib instance;
 	

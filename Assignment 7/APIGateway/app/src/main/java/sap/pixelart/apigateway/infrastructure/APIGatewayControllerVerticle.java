@@ -229,7 +229,7 @@ public class APIGatewayControllerVerticle extends AbstractVerticle implements Pi
 				
 				JsonObject reply = new JsonObject();
 				serviceAPI
-				.subscribePixelGridEvents(this::pixelColorChanged)
+				.subscribePixelGridEvents(this) //this::pixelColorChanged
 				.onSuccess((JsonObject grid) -> {
 					reply.put("event", "subscription-started");
 					reply.put("pixelGridCurrentState", grid);

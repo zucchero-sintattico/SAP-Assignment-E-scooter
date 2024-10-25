@@ -6,11 +6,10 @@ import sap.pixelart.library.PixelArtServiceLib;
 
 public class APIGatewayService {
 
-	private static int DEFAULT_HTTP_PORT = 9001;
+	private static final int DEFAULT_HTTP_PORT = 9001;
 
-	private PixelArtAsyncAPI service;
-	private APIGatewayController restBasedAdapter;
-	private int restAPIPort; 
+	private final PixelArtAsyncAPI service;
+    private int restAPIPort;
 	
 	public APIGatewayService() {
     	service = PixelArtServiceLib.getInstance().getDefaultInterface();
@@ -22,7 +21,7 @@ public class APIGatewayService {
 	}
 	
 	public void launch() {
-    	restBasedAdapter = new APIGatewayController(restAPIPort);	    	
+        APIGatewayController restBasedAdapter = new APIGatewayController(restAPIPort);
     	restBasedAdapter.init(service);
 	}
 }

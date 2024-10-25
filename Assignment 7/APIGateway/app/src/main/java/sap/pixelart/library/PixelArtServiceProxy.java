@@ -2,13 +2,10 @@ package sap.pixelart.library;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import io.vertx.core.*;
-import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.*;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
-import io.vertx.core.http.HttpClientRequest;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.WebSocket;
 import io.vertx.core.http.WebSocketConnectOptions;
@@ -17,7 +14,7 @@ class PixelArtServiceProxy implements PixelArtAsyncAPI {
 
     static Logger logger = Logger.getLogger("[PixelArt Service Proxy]");	
 	private HttpClient client;
-	private Vertx vertx;
+	private final Vertx vertx;
 	private String brushId;
 	private String host;
 	private int port;
@@ -33,6 +30,12 @@ class PixelArtServiceProxy implements PixelArtAsyncAPI {
 					.setDefaultHost(host)
 					.setDefaultPort(port);
 		client = vertx.createHttpClient(options);
+		sendLogRequest("[API Gateway] - Init of the PixelArtServiceProxy.")
+			.onComplete(logRes -> {
+				if (logRes.failed()) {
+					logger.log(Level.WARNING, "Errore durante l'invio del log: " + logRes.cause());
+				}
+			});
 	}
 
 	public Future<String> createBrush() {	
@@ -53,6 +56,14 @@ class PixelArtServiceProxy implements PixelArtAsyncAPI {
 		.onFailure(f -> {
 			p.fail(f.getMessage());
 		});
+
+		sendLogRequest("[API Gateway] - Terminated CreateBrush!")
+			.onComplete(logRes -> {
+				if (logRes.failed()) {
+					logger.log(Level.WARNING, "Errore durante l'invio del log: " + logRes.cause());
+				}
+			});
+
 		return p.future();
 	}
 
@@ -75,6 +86,14 @@ class PixelArtServiceProxy implements PixelArtAsyncAPI {
 		.onFailure(f -> {
 			p.fail(f.getMessage());
 		});
+
+		sendLogRequest("[API Gateway] - Terminated getCurrentBrushes!")
+			.onComplete(logRes -> {
+				if (logRes.failed()) {
+					logger.log(Level.WARNING, "Errore durante l'invio del log: " + logRes.cause());
+				}
+			});
+
 		return p.future();
 	}
 
@@ -97,6 +116,14 @@ class PixelArtServiceProxy implements PixelArtAsyncAPI {
 		.onFailure(f -> {
 			p.fail(f.getMessage());
 		});
+
+		sendLogRequest("[API Gateway] - Terminated getBrushInfo!")
+			.onComplete(logRes -> {
+				if (logRes.failed()) {
+					logger.log(Level.WARNING, "Errore durante l'invio del log: " + logRes.cause());
+				}
+			});
+
 		return p.future();
 	}
 
@@ -119,6 +146,14 @@ class PixelArtServiceProxy implements PixelArtAsyncAPI {
 		.onFailure(f -> {
 			p.fail(f.getMessage());
 		});
+
+		sendLogRequest("[API Gateway] - Terminated getPixelGridState!")
+			.onComplete(logRes -> {
+				if (logRes.failed()) {
+					logger.log(Level.WARNING, "Errore durante l'invio del log: " + logRes.cause());
+				}
+			});
+
 		return p.future();
 	}
 
@@ -145,6 +180,14 @@ class PixelArtServiceProxy implements PixelArtAsyncAPI {
 		.onFailure(f -> {
 			p.fail(f.getMessage());
 		});
+
+		sendLogRequest("[API Gateway] - Terminated moveBrushTo!")
+			.onComplete(logRes -> {
+				if (logRes.failed()) {
+					logger.log(Level.WARNING, "Errore durante l'invio del log: " + logRes.cause());
+				}
+			});
+
 		return p.future();
 	}
 
@@ -164,6 +207,14 @@ class PixelArtServiceProxy implements PixelArtAsyncAPI {
 		.onFailure(f -> {
 			p.fail(f.getMessage());
 		});
+
+		sendLogRequest("[API Gateway] - Terminated SelectPixel!")
+			.onComplete(logRes -> {
+				if (logRes.failed()) {
+					logger.log(Level.WARNING, "Errore durante l'invio del log: " + logRes.cause());
+				}
+			});
+
 		return p.future();
 	}
 
@@ -189,6 +240,14 @@ class PixelArtServiceProxy implements PixelArtAsyncAPI {
 		.onFailure(f -> {
 			p.fail(f.getMessage());
 		});
+
+		sendLogRequest("[API Gateway] - Terminated changeBrushColor!")
+			.onComplete(logRes -> {
+				if (logRes.failed()) {
+					logger.log(Level.WARNING, "Errore durante l'invio del log: " + logRes.cause());
+				}
+			});
+
 		return p.future();
 	}
 
@@ -210,6 +269,14 @@ class PixelArtServiceProxy implements PixelArtAsyncAPI {
 		.onFailure(f -> {
 			p.fail(f.getMessage());
 		});
+
+		sendLogRequest("[API Gateway] - Terminated destroyBrush!")
+			.onComplete(logRes -> {
+				if (logRes.failed()) {
+					logger.log(Level.WARNING, "Errore durante l'invio del log: " + logRes.cause());
+				}
+			});
+
 		return p.future();
 	}
 
@@ -250,7 +317,46 @@ class PixelArtServiceProxy implements PixelArtAsyncAPI {
 					p.fail(res.cause());
 				}
 		});
-		
+		// Log request e gestisci il risultato dell'invio del log
+		sendLogRequest("[API Gateway] - Terminated subscribePixelGridEvent!")
+			.onComplete(logRes -> {
+				if (logRes.failed()) {
+					logger.log(Level.WARNING, "Errore durante l'invio del log: " + logRes.cause());
+				}
+			});
+
+		return p.future();
+	}
+
+	//Part of the Pattern for the Distributed Log.
+	private Future<Void> sendLogRequest(String messageLog) {
+		Promise<Void> p = Promise.promise();
+
+		JsonObject logData = new JsonObject().put("message", messageLog);
+		client
+				.request(HttpMethod.POST, 9003, "localhost", "/api/log")
+				.onSuccess(request -> {
+					// Imposta l'header content-type
+					request.putHeader("content-type", "application/json");
+
+					// Converti l'oggetto JSON in una stringa e invialo come corpo della richiesta
+					String payload = logData.encodePrettily();
+					request.putHeader("content-length", "" + payload.length());
+
+					request.write(payload);
+
+					request.response().onSuccess(resp -> {
+						p.complete();
+					});
+
+					System.out.println("[Log] Received response with status code " + request.getURI());
+					// Invia la richiesta
+					request.end();
+				})
+				.onFailure(f -> {
+					p.fail(f.getMessage());
+				});
+
 		return p.future();
 	}
 }
