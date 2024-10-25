@@ -100,8 +100,8 @@ public class DistributedLogControllerVerticle extends AbstractVerticle {
 
         // Configura il server e le rotte
         Router router = Router.router(vertx);
-        router.route(HttpMethod.GET, "/api/log").handler(this::sendLogsList);  // API GET per visualizzare i log
-        router.route(HttpMethod.POST, "/api/log").handler(this::printLogMessage);  // API POST per ricevere i log
+        router.route(HttpMethod.GET, "/api/logs").handler(this::sendLogsList);  // API GET per visualizzare i log
+        router.route(HttpMethod.POST, "/api/logs").handler(this::printLogMessage);  // API POST per ricevere i log
 
         vertx.createHttpServer().requestHandler(router).listen(port);
     }
@@ -111,22 +111,41 @@ public class DistributedLogControllerVerticle extends AbstractVerticle {
         context.request().bodyHandler(buffer -> {
             String message = buffer.toString();
 
-            if (message.isEmpty()) {
-                sendReply(context, new JsonObject().put("status", "No valid log"), 400);
-                return;
+            // Se il messaggio è JSON, estrai il campo 'message' e aggiungi a logMessagesList
+            try {
+                JsonObject jsonMessage = new JsonObject(message);
+                String logContent = jsonMessage.getString("message", message); // Estrai il campo 'message' o usa il messaggio originale se non esiste
+                logMessagesList.add(logContent);
+                logger.log(Level.INFO, "Message received: " + logContent);
+            } catch (Exception e) {
+                // Se c'è un errore, aggiungi il messaggio originale
+                logMessagesList.add(message);
+                logger.log(Level.INFO, "Invalid JSON format, storing original message: " + message);
             }
 
-            logMessagesList.add(message);
-            logger.log(Level.INFO, "Message received: " + message);
             sendReply(context, new JsonObject().put("status", "Message received successfully"), 200);
         });
     }
 
     // Gestore GET: restituisce i log salvati in formato JSON
     private void sendLogsList(RoutingContext context) {
-        JsonArray logsArray = new JsonArray(logMessagesList.stream()
-                .map(msg -> new JsonObject().put("content", msg)).toList());
-        context.response().setStatusCode(200).putHeader("content-type", "application/json").end(new JsonObject().put("logs", logsArray).encodePrettily());
+        JsonArray logsArray = new JsonArray();
+
+        for (String message : logMessagesList) {
+            // Crea un oggetto JSON per ogni messaggio di log
+            JsonObject logEntry = new JsonObject()
+                    .put("timestamp", System.currentTimeMillis())
+                    .put("content", message); // Messaggio di log senza escape
+
+            logsArray.add(logEntry);
+        }
+
+        // Crea la risposta finale e inviala al client
+        JsonObject responseJson = new JsonObject().put("logs", logsArray);
+        context.response()
+                .setStatusCode(200)
+                .putHeader("content-type", "application/json")
+                .end(responseJson.encodePrettily());
     }
 
     // Helper per inviare una risposta JSON

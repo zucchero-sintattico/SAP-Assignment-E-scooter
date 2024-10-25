@@ -334,7 +334,7 @@ class PixelArtServiceProxy implements PixelArtAsyncAPI {
 
 		JsonObject logData = new JsonObject().put("message", messageLog);
 		client
-				.request(HttpMethod.POST, 9003, "localhost", "/api/log")
+				.request(HttpMethod.POST, 9003, "localhost", "/api/logs")
 				.onSuccess(request -> {
 					// Imposta l'header content-type
 					request.putHeader("content-type", "application/json");
