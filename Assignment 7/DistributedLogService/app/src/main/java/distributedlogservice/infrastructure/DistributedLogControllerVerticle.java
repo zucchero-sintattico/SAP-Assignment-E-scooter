@@ -96,7 +96,7 @@ public class DistributedLogControllerVerticle extends AbstractVerticle {
 
     @Override
     public void start() {
-        logger.log(Level.INFO, "Distributed Log Service avviato sulla porta: " + port);
+        logger.log(Level.INFO, "Distributed Log Service started on port: " + port);
 
         // Configura il server e le rotte
         Router router = Router.router(vertx);
@@ -110,9 +110,15 @@ public class DistributedLogControllerVerticle extends AbstractVerticle {
     private void printLogMessage(RoutingContext context) {
         context.request().bodyHandler(buffer -> {
             String message = buffer.toString();
+
+            if (message.isEmpty()) {
+                sendReply(context, new JsonObject().put("status", "No valid log"), 400);
+                return;
+            }
+
             logMessagesList.add(message);
-            logger.log(Level.INFO, "Messaggio ricevuto: " + message);
-            sendReply(context, new JsonObject().put("status", "Messaggio ricevuto con successo"));
+            logger.log(Level.INFO, "Message received: " + message);
+            sendReply(context, new JsonObject().put("status", "Message received successfully"), 200);
         });
     }
 
@@ -120,11 +126,11 @@ public class DistributedLogControllerVerticle extends AbstractVerticle {
     private void sendLogsList(RoutingContext context) {
         JsonArray logsArray = new JsonArray(logMessagesList.stream()
                 .map(msg -> new JsonObject().put("content", msg)).toList());
-        context.response().putHeader("content-type", "application/json").end(new JsonObject().put("logs", logsArray).encodePrettily());
+        context.response().setStatusCode(200).putHeader("content-type", "application/json").end(new JsonObject().put("logs", logsArray).encodePrettily());
     }
 
     // Helper per inviare una risposta JSON
-    private void sendReply(RoutingContext context, JsonObject reply) {
-        context.response().putHeader("content-type", "application/json").end(reply.encode());
+    private void sendReply(RoutingContext context, JsonObject reply, int statusCode) {
+        context.response().setStatusCode(statusCode).putHeader("content-type", "application/json").end(reply.encode());
     }
 }
