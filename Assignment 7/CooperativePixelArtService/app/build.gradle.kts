@@ -26,7 +26,7 @@ dependencies {
  	implementation("io.vertx:vertx-web:4.4.5")
 
 	// Brave
-	implementation("io.zipkin.brave:brave-instrumentation-okhttp3")
+	implementation("io.zipkin.brave:brave:6.0.0")
 
 
     // This dependency is used by the application.
