@@ -3,6 +3,11 @@ package sap.pixelart.apigateway.infrastructure;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import brave.ScopedSpan;
+import brave.Tracer;
+import brave.Tracing;
+import brave.handler.SpanHandler;
+import brave.propagation.ThreadLocalCurrentTraceContext;
 import io.prometheus.metrics.core.metrics.Counter;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.eventbus.EventBus;
@@ -13,6 +18,10 @@ import io.vertx.core.json.*;
 import io.vertx.ext.web.*;
 import sap.pixelart.library.PixelArtAsyncAPI;
 import sap.pixelart.library.PixelGridEventObserver;
+import zipkin2.Span;
+import zipkin2.reporter.AsyncReporter;
+import zipkin2.reporter.brave.ZipkinSpanHandler;
+import zipkin2.reporter.okhttp3.OkHttpSender;
 
 /**
  * 
@@ -29,12 +38,28 @@ public class APIGatewayControllerVerticle extends AbstractVerticle implements Pi
 	static Logger logger = Logger.getLogger("[PixelArt Service]");
 	static String PIXEL_GRID_CHANNEL = "pixel-grid-events";
 	private final Counter counter;
+	private final Tracer tracer;
 
 	public APIGatewayControllerVerticle(int port, PixelArtAsyncAPI serviceAPI, Counter counter) {
 		this.port = port;
 		this.serviceAPI = serviceAPI;
 		logger.setLevel(Level.INFO);
 		this.counter = counter;
+
+		//Initialize the Tracer
+		OkHttpSender sender = OkHttpSender.create("http://localhost:9411/api/v2/spans");
+		// Crea un AsyncReporter per inviare gli span a Zipkin
+		AsyncReporter<Span> reporter = AsyncReporter.create(sender);
+		// Crea lo ZipkinSpanHandler usando il reporter
+		SpanHandler zipkinSpanHandler = ZipkinSpanHandler.newBuilder(reporter).build();
+		// Imposta il tracing con il zipkinSpanHandler
+		Tracing tracing = Tracing.newBuilder()
+				.localServiceName("APIGatewayService")
+				.addSpanHandler(zipkinSpanHandler)
+				.currentTraceContext(ThreadLocalCurrentTraceContext.newBuilder().build())
+				.build();
+
+		this.tracer = tracing.tracer();
 	}
 
 	public void start() {
@@ -66,177 +91,217 @@ public class APIGatewayControllerVerticle extends AbstractVerticle implements Pi
 	/* List of handlers, mapping the API */
 	
 	protected void createBrush(RoutingContext context) {
-		this.counter.labelValues("POST", "/api/brushes", "success").inc();
-		logger.log(Level.INFO, "CreateBrush request - " + context.currentRoute().getPath());
-		JsonObject reply = new JsonObject();
-		serviceAPI
-		.createBrush()
-		.onSuccess((String brushId) -> {
-			try {
-				reply.put("brushId", brushId);
-				sendReply(context.response(), reply);
-			} catch (Exception ex) {
-				sendServiceError(context.response());
-			}
-		})
-		.onFailure((e) -> {
-			sendServiceError(context.response());
-			this.counter.labelValues("POST", "/api/brushes", "error").inc();
-		});
+		ScopedSpan span = this.tracer.startScopedSpan("createBrush");
+		try {
+			this.counter.labelValues("POST", "/api/brushes", "success").inc();
+			logger.log(Level.INFO, "CreateBrush request - " + context.currentRoute().getPath());
+			JsonObject reply = new JsonObject();
+			serviceAPI
+				.createBrush()
+				.onSuccess((String brushId) -> {
+					try {
+						reply.put("brushId", brushId);
+						sendReply(context.response(), reply);
+					} catch (Exception ex) {
+						sendServiceError(context.response());
+					}
+				})
+				.onFailure((e) -> {
+					sendServiceError(context.response());
+					this.counter.labelValues("POST", "/api/brushes", "error").inc();
+				});
+		}finally {
+			span.finish();
+		}
 	}
 
 	protected void getCurrentBrushes(RoutingContext context) {
-		this.counter.labelValues("GET", "/api/brushes", "success").inc();
-		logger.log(Level.INFO, "GetCurrentBrushes request - " + context.currentRoute().getPath());
+		ScopedSpan span = this.tracer.startScopedSpan("getCurrentBrushes");
+		try {
+			this.counter.labelValues("GET", "/api/brushes", "success").inc();
+			logger.log(Level.INFO, "GetCurrentBrushes request - " + context.currentRoute().getPath());
 
-		JsonObject reply = new JsonObject();
-		serviceAPI
-		.getCurrentBrushes()
-		.onSuccess((JsonArray brushes) -> {
-			try {
-				reply.put("brushes", brushes);
-				sendReply(context.response(), reply);
-			} catch (Exception ex) {
-				sendServiceError(context.response());
-			}
-		})
-		.onFailure((e) -> {
-			sendServiceError(context.response());
-			this.counter.labelValues("GET", "/api/brushes", "error").inc();
-		});
+			JsonObject reply = new JsonObject();
+			serviceAPI
+				.getCurrentBrushes()
+				.onSuccess((JsonArray brushes) -> {
+					try {
+						reply.put("brushes", brushes);
+						sendReply(context.response(), reply);
+					} catch (Exception ex) {
+						sendServiceError(context.response());
+					}
+				})
+				.onFailure((e) -> {
+					sendServiceError(context.response());
+					this.counter.labelValues("GET", "/api/brushes", "error").inc();
+				});
+		} finally {
+			span.finish();
+		}
 	}
 
 	protected void getBrushInfo(RoutingContext context) {
-		this.counter.labelValues("GET", "/api/brushes/:brushId", "success").inc();
-		logger.log(Level.INFO, "Get Brush info request: " + context.currentRoute().getPath());
-		String brushId = context.pathParam("brushId");
-		JsonObject reply = new JsonObject();
-		serviceAPI
-		.getBrushInfo(brushId)
-		.onSuccess((JsonObject info) -> {
-			try {
-				reply.put("brushInfo", info);
-				sendReply(context.response(), reply);
-			} catch (Exception ex) {
-				sendServiceError(context.response());
-			}
-		})
-		.onFailure((e) -> {
-			sendServiceError(context.response());
-			this.counter.labelValues("GET", "/api/brushes/:brushId", "error").inc();
-		});
+		ScopedSpan span = this.tracer.startScopedSpan("getBrushInfo");
+		try {
+			this.counter.labelValues("GET", "/api/brushes/:brushId", "success").inc();
+			logger.log(Level.INFO, "Get Brush info request: " + context.currentRoute().getPath());
+			String brushId = context.pathParam("brushId");
+			JsonObject reply = new JsonObject();
+			serviceAPI
+				.getBrushInfo(brushId)
+				.onSuccess((JsonObject info) -> {
+					try {
+						reply.put("brushInfo", info);
+						sendReply(context.response(), reply);
+					} catch (Exception ex) {
+						sendServiceError(context.response());
+					}
+				})
+				.onFailure((e) -> {
+					sendServiceError(context.response());
+					this.counter.labelValues("GET", "/api/brushes/:brushId", "error").inc();
+				});
+		} finally {
+			span.finish();
+		}
 	}
 
 	protected void moveBrushTo(RoutingContext context) {
-		this.counter.labelValues("POST", "/api/brushes/:brushId/move-to", "success").inc();
-		logger.log(Level.INFO, "MoveBrushTo request: " + context.currentRoute().getPath());
-		String brushId = context.pathParam("brushId");
-		logger.log(Level.INFO, "Brush id: " + brushId);
-		context.request().handler(buf -> {
-			JsonObject brushInfo = buf.toJsonObject();
-			int x = brushInfo.getInteger("x");
-			int y = brushInfo.getInteger("y");
-			JsonObject reply = new JsonObject();
+		ScopedSpan span = this.tracer.startScopedSpan("moveBrushTo");
+		try {
+			this.counter.labelValues("POST", "/api/brushes/:brushId/move-to", "success").inc();
+			logger.log(Level.INFO, "MoveBrushTo request: " + context.currentRoute().getPath());
+			String brushId = context.pathParam("brushId");
+			logger.log(Level.INFO, "Brush id: " + brushId);
+			context.request().handler(buf -> {
+				JsonObject brushInfo = buf.toJsonObject();
+				int x = brushInfo.getInteger("x");
+				int y = brushInfo.getInteger("y");
+				JsonObject reply = new JsonObject();
 
-			serviceAPI
-			.moveBrushTo(brushId, y, x)
-			.onSuccess((v) -> {
-				try {
-					sendReply(context.response(), reply);
-				} catch (Exception ex) {
-					sendServiceError(context.response());
-					this.counter.labelValues("POST", "/api/brushes/:brushId/move-to", "error").inc();
-				}
-			})
-			.onFailure((e) -> {
-				sendServiceError(context.response());			
+				serviceAPI
+					.moveBrushTo(brushId, y, x)
+					.onSuccess((v) -> {
+						try {
+							sendReply(context.response(), reply);
+						} catch (Exception ex) {
+							sendServiceError(context.response());
+							this.counter.labelValues("POST", "/api/brushes/:brushId/move-to", "error").inc();
+						}
+					})
+					.onFailure((e) -> {
+						sendServiceError(context.response());
+					});
 			});
-		});
+		} finally {
+			span.finish();
+		}
 	}
 
 	protected void changeBrushColor(RoutingContext context) {
-		this.counter.labelValues("POST", "/api/brushes/:brushId/change-color", "success").inc();
-		logger.log(Level.INFO, "ChangeBrushColor request: " + context.currentRoute().getPath());
-		String brushId = context.pathParam("brushId");
-		context.request().handler(buf -> {
-			JsonObject brushInfo = buf.toJsonObject();
-			logger.log(Level.INFO, "Body: " + brushInfo.encodePrettily());
-			int c = brushInfo.getInteger("color");
-			JsonObject reply = new JsonObject();
-			serviceAPI
-			.changeBrushColor(brushId, c)
-			.onSuccess((v) -> {
-				try {
-					sendReply(context.response(), reply);
-				} catch (Exception ex) {
-					sendServiceError(context.response());
-				}
-			})
-			.onFailure((e) -> {
-				sendServiceError(context.response());
-				this.counter.labelValues("POST", "/api/brushes/:brushId/change-color", "error").inc();
+		ScopedSpan span = this.tracer.startScopedSpan("changeBrushColor");
+		try {
+			this.counter.labelValues("POST", "/api/brushes/:brushId/change-color", "success").inc();
+			logger.log(Level.INFO, "ChangeBrushColor request: " + context.currentRoute().getPath());
+			String brushId = context.pathParam("brushId");
+			context.request().handler(buf -> {
+				JsonObject brushInfo = buf.toJsonObject();
+				logger.log(Level.INFO, "Body: " + brushInfo.encodePrettily());
+				int c = brushInfo.getInteger("color");
+				JsonObject reply = new JsonObject();
+				serviceAPI
+					.changeBrushColor(brushId, c)
+					.onSuccess((v) -> {
+						try {
+							sendReply(context.response(), reply);
+						} catch (Exception ex) {
+							sendServiceError(context.response());
+						}
+					})
+					.onFailure((e) -> {
+						sendServiceError(context.response());
+						this.counter.labelValues("POST", "/api/brushes/:brushId/change-color", "error").inc();
+					});
 			});
-		});
+		} finally {
+			span.finish();
+		}
 	}
 
 	protected void selectPixel(RoutingContext context) {
-		this.counter.labelValues("POST", "/api/brushes/:brushId/select-pixel", "success").inc();
-		logger.log(Level.INFO, "SelectPixel request: " + context.currentRoute().getPath());
-		String brushId = context.pathParam("brushId");
-		JsonObject reply = new JsonObject();
-		serviceAPI
-		.selectPixel(brushId)
-		.onSuccess((v) -> {
-			try {
-				sendReply(context.response(), reply);
-			} catch (Exception ex) {
-				sendServiceError(context.response());
-			}
-		})
-		.onFailure((e) -> {
-			sendServiceError(context.response());
-			this.counter.labelValues("POST", "/api/brushes/:brushId/select-pixel", "error").inc();
-		});
+		ScopedSpan span = this.tracer.startScopedSpan("selectPixel");
+		try {
+			this.counter.labelValues("POST", "/api/brushes/:brushId/select-pixel", "success").inc();
+			logger.log(Level.INFO, "SelectPixel request: " + context.currentRoute().getPath());
+			String brushId = context.pathParam("brushId");
+			JsonObject reply = new JsonObject();
+			serviceAPI
+				.selectPixel(brushId)
+				.onSuccess((v) -> {
+					try {
+						sendReply(context.response(), reply);
+					} catch (Exception ex) {
+						sendServiceError(context.response());
+					}
+				})
+				.onFailure((e) -> {
+					sendServiceError(context.response());
+					this.counter.labelValues("POST", "/api/brushes/:brushId/select-pixel", "error").inc();
+				});
+		} finally {
+			span.finish();
+		}
 	}
 
 	protected void destroyBrush(RoutingContext context) {
-		this.counter.labelValues("DELETE", "/api/brushes/:brushId", "success").inc();
-		logger.log(Level.INFO, "Destroy Brush request: " + context.currentRoute().getPath());
-		String brushId = context.pathParam("brushId");
-		JsonObject reply = new JsonObject();
-		serviceAPI
-		.destroyBrush(brushId)
-		.onSuccess((v) -> {
-			try {
-				sendReply(context.response(), reply);
-			} catch (Exception ex) {
-				sendServiceError(context.response());
-			}
-		})
-		.onFailure((e) -> {
-			sendServiceError(context.response());
-			this.counter.labelValues("DELETE", "/api/brushes/:brushId", "error").inc();
-		});
+		ScopedSpan span = this.tracer.startScopedSpan("destroyBrush");
+		try {
+			this.counter.labelValues("DELETE", "/api/brushes/:brushId", "success").inc();
+			logger.log(Level.INFO, "Destroy Brush request: " + context.currentRoute().getPath());
+			String brushId = context.pathParam("brushId");
+			JsonObject reply = new JsonObject();
+			serviceAPI
+				.destroyBrush(brushId)
+				.onSuccess((v) -> {
+					try {
+						sendReply(context.response(), reply);
+					} catch (Exception ex) {
+						sendServiceError(context.response());
+					}
+				})
+				.onFailure((e) -> {
+					sendServiceError(context.response());
+					this.counter.labelValues("DELETE", "/api/brushes/:brushId", "error").inc();
+				});
+		} finally {
+			span.finish();
+		}
 	}
 
 	protected void getPixelGridState(RoutingContext context) {
-		this.counter.labelValues("GET", "/api/pixel-grid", "success").inc();
-		logger.log(Level.INFO, "Get Pixel Grid state request: " + context.currentRoute().getPath());
-		JsonObject reply = new JsonObject();
-		serviceAPI
-		.getPixelGridState()
-		.onSuccess((JsonObject info) -> {
-			try {
-				reply.put("pixelGrid", info);
-				sendReply(context.response(), reply);
-			} catch (Exception ex) {
-				sendServiceError(context.response());
-			}
-		})
-		.onFailure((e) -> {
-			sendServiceError(context.response());
-			this.counter.labelValues("GET", "/api/pixel-grid", "error").inc();
-		});
+		ScopedSpan span = this.tracer.startScopedSpan("getPixelGridState");
+		try {
+			this.counter.labelValues("GET", "/api/pixel-grid", "success").inc();
+			logger.log(Level.INFO, "Get Pixel Grid state request: " + context.currentRoute().getPath());
+			JsonObject reply = new JsonObject();
+			serviceAPI
+				.getPixelGridState()
+				.onSuccess((JsonObject info) -> {
+					try {
+						reply.put("pixelGrid", info);
+						sendReply(context.response(), reply);
+					} catch (Exception ex) {
+						sendServiceError(context.response());
+					}
+				})
+				.onFailure((e) -> {
+					sendServiceError(context.response());
+					this.counter.labelValues("GET", "/api/pixel-grid", "error").inc();
+				});
+		} finally {
+			span.finish();
+		}
 	}
 
 	/* Handling subscribers using web sockets */

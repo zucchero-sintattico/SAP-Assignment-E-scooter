@@ -25,8 +25,16 @@ dependencies {
  	implementation("io.vertx:vertx-core:4.4.5")
  	implementation("io.vertx:vertx-web:4.4.5")
 
+    // Brave
+    implementation("io.zipkin.brave:brave:6.0.3")
+    implementation("io.zipkin.reporter2:zipkin-reporter-brave:3.4.0")
+    implementation("io.zipkin.reporter2:zipkin-sender-okhttp3:3.3.0")
+    implementation("io.zipkin.zipkin2:zipkin:3.3.1")
+    implementation("io.zipkin.brave:brave-instrumentation-http:5.12.7")
+
+
     // Prometheus
-    implementation("io.prometheus:prometheus-metrics-core:1.0.0")
+    implementation("io.prometheus:prometheus-metrics-core:1.3.0")
     implementation("io.prometheus:prometheus-metrics-instrumentation-jvm:1.0.0")
     implementation("io.prometheus:prometheus-metrics-exporter-httpserver:1.0.0")
 

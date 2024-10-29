@@ -7,6 +7,11 @@ import java.lang.management.OperatingSystemMXBean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import brave.ScopedSpan;
+import brave.Tracer;
+import brave.Tracing;
+import brave.handler.SpanHandler;
+import brave.propagation.ThreadLocalCurrentTraceContext;
 import io.prometheus.metrics.core.metrics.Gauge;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
@@ -18,6 +23,10 @@ import io.vertx.core.json.*;
 import io.vertx.ext.web.*;
 import sap.pixelart.service.application.*;
 import sap.pixelart.service.domain.*;
+import zipkin2.Span;
+import zipkin2.reporter.AsyncReporter;
+import zipkin2.reporter.brave.ZipkinSpanHandler;
+import zipkin2.reporter.okhttp3.OkHttpSender;
 
 /**
  * 
@@ -40,6 +49,8 @@ public class RestPixelArtServiceControllerVerticle extends AbstractVerticle impl
 	private final Gauge heapMemory;
 	private final Gauge nonHeapMemory;
 
+	private final Tracer tracer;
+
 	public RestPixelArtServiceControllerVerticle(int port, PixelArtAPI appAPI, Gauge cpu, Gauge heapMemory, Gauge nonHeapMemory) {
 		this.port = port;
 		this.pixelArtAPI = appAPI;
@@ -54,6 +65,21 @@ public class RestPixelArtServiceControllerVerticle extends AbstractVerticle impl
 		this.cpu = cpu;
 		this.heapMemory = heapMemory;
 		this.nonHeapMemory = nonHeapMemory;
+
+		//Initialize the Tracer
+		OkHttpSender sender = OkHttpSender.create("http://localhost:9411/api/v2/spans");
+		// Crea un AsyncReporter per inviare gli span a Zipkin
+		AsyncReporter<Span> reporter = AsyncReporter.create(sender);
+		// Crea lo ZipkinSpanHandler usando il reporter
+		SpanHandler zipkinSpanHandler = ZipkinSpanHandler.newBuilder(reporter).build();
+		// Imposta il tracing con il zipkinSpanHandler
+		Tracing tracing = Tracing.newBuilder()
+				.localServiceName("PixelArtService")
+				.addSpanHandler(zipkinSpanHandler)
+				.currentTraceContext(ThreadLocalCurrentTraceContext.newBuilder().build())
+				.build();
+
+		this.tracer = tracing.tracer();
 
 		sendLogRequest("[CooperativePixelArtService] - Init the RestPixelArtServiceControllerVerticle!")
 				.onComplete(logRes -> {
@@ -92,259 +118,299 @@ public class RestPixelArtServiceControllerVerticle extends AbstractVerticle impl
 	/* List of handlers, mapping the API */
 	
 	protected void createBrush(RoutingContext context) {
-		logger.log(Level.INFO, "CreateBrush request - " + context.currentRoute().getPath());
-
-		JsonObject reply = new JsonObject();
+		ScopedSpan span = this.tracer.startScopedSpan("createBrush");
 		try {
-			String brushId = pixelArtAPI.createBrush();
-			logger.log(Level.INFO, "Brush Number: " + brushId);
-			reply.put("brushId", brushId);
-			sendReply(context.response(), reply);
-		} catch (Exception ex) {
-			sendServiceError(context.response());
-		}
-		sendLogRequest("[CooperativePixelArtService] - Terminated createBrush!")
+			logger.log(Level.INFO, "CreateBrush request - " + context.currentRoute().getPath());
+
+			JsonObject reply = new JsonObject();
+			try {
+				String brushId = pixelArtAPI.createBrush();
+				logger.log(Level.INFO, "Brush Number: " + brushId);
+				reply.put("brushId", brushId);
+				sendReply(context.response(), reply);
+			} catch (Exception ex) {
+				sendServiceError(context.response());
+			}
+			sendLogRequest("[CooperativePixelArtService] - Terminated createBrush!")
 				.onComplete(logRes -> {
 					if (logRes.failed()) {
 						logger.log(Level.WARNING, "Errore durante l'invio del log: " + logRes.cause());
 					}
 				});
 
-		/* Prometheus */
-		// Update CPU usage metric
-		double cpuUsageValue = getProcessCpuLoad();
-		this.cpu.inc(cpuUsageValue);
+			/* Prometheus */
+			// Update CPU usage metric
+			double cpuUsageValue = getProcessCpuLoad();
+			this.cpu.inc(cpuUsageValue);
 
-		// Update memory metrics
-		long heapMemoryUsedValue = getHeapMemoryUsage().getUsed();
-		long nonHeapMemoryUsedValue = getNonHeapMemoryUsage().getUsed();
+			// Update memory metrics
+			long heapMemoryUsedValue = getHeapMemoryUsage().getUsed();
+			long nonHeapMemoryUsedValue = getNonHeapMemoryUsage().getUsed();
 
-		this.heapMemory.inc(heapMemoryUsedValue);
-		this.nonHeapMemory.inc(nonHeapMemoryUsedValue);
+			this.heapMemory.inc(heapMemoryUsedValue);
+			this.nonHeapMemory.inc(nonHeapMemoryUsedValue);
+		} finally {
+			span.finish();
+		}
 	}
 
 	protected void getCurrentBrushes(RoutingContext context) {
-		logger.log(Level.INFO, "GetCurrentBrushes request - " + context.currentRoute().getPath());
-
-		JsonObject reply = new JsonObject();
+		ScopedSpan span = this.tracer.startScopedSpan("getCurrentBrushes");
 		try {
-			JsonArray brushes = pixelArtAPI.getCurrentBrushes();
-			reply.put("brushes", brushes);
-			sendReply(context.response(), reply);
-		} catch (Exception ex) {
-			sendServiceError(context.response());
-		}
-		sendLogRequest("[CooperativePixelArtService] - Terminated getCurrentBrushes!")
+			logger.log(Level.INFO, "GetCurrentBrushes request - " + context.currentRoute().getPath());
+
+			JsonObject reply = new JsonObject();
+			try {
+				JsonArray brushes = pixelArtAPI.getCurrentBrushes();
+				reply.put("brushes", brushes);
+				sendReply(context.response(), reply);
+			} catch (Exception ex) {
+				sendServiceError(context.response());
+			}
+			sendLogRequest("[CooperativePixelArtService] - Terminated getCurrentBrushes!")
 				.onComplete(logRes -> {
 					if (logRes.failed()) {
 						logger.log(Level.WARNING, "Errore durante l'invio del log: " + logRes.cause());
 					}
 				});
 
-		/* Prometheus */
-		// Update CPU usage metric
-		double cpuUsageValue = getProcessCpuLoad();
-		this.cpu.inc(cpuUsageValue);
+			/* Prometheus */
+			// Update CPU usage metric
+			double cpuUsageValue = getProcessCpuLoad();
+			this.cpu.inc(cpuUsageValue);
 
-		// Update memory metrics
-		long heapMemoryUsedValue = getHeapMemoryUsage().getUsed();
-		long nonHeapMemoryUsedValue = getNonHeapMemoryUsage().getUsed();
+			// Update memory metrics
+			long heapMemoryUsedValue = getHeapMemoryUsage().getUsed();
+			long nonHeapMemoryUsedValue = getNonHeapMemoryUsage().getUsed();
 
-		this.heapMemory.inc(heapMemoryUsedValue);
-		this.nonHeapMemory.inc(nonHeapMemoryUsedValue);
+			this.heapMemory.inc(heapMemoryUsedValue);
+			this.nonHeapMemory.inc(nonHeapMemoryUsedValue);
+		} finally {
+			span.finish();
+		}
 	}
 
 	protected void getBrushInfo(RoutingContext context) {
-		logger.log(Level.INFO, "Get Brush info request: " + context.currentRoute().getPath());
-		String brushId = context.pathParam("brushId");
-		JsonObject reply = new JsonObject();
+		ScopedSpan span = this.tracer.startScopedSpan("getBrushInfo");
 		try {
-			JsonObject info = pixelArtAPI.getBrushInfo(brushId);
-			reply.put("brushInfo", info);
-			sendReply(context.response(), reply);
-		} catch (Exception ex) {
-			sendServiceError(context.response());
-		}
-		sendLogRequest("[CooperativePixelArtService] - Terminated getBrushInfo!")
+			logger.log(Level.INFO, "Get Brush info request: " + context.currentRoute().getPath());
+			String brushId = context.pathParam("brushId");
+			JsonObject reply = new JsonObject();
+			try {
+				JsonObject info = pixelArtAPI.getBrushInfo(brushId);
+				reply.put("brushInfo", info);
+				sendReply(context.response(), reply);
+			} catch (Exception ex) {
+				sendServiceError(context.response());
+			}
+			sendLogRequest("[CooperativePixelArtService] - Terminated getBrushInfo!")
 				.onComplete(logRes -> {
 					if (logRes.failed()) {
 						logger.log(Level.WARNING, "Errore durante l'invio del log: " + logRes.cause());
 					}
 				});
 
-		/* Prometheus */
-		// Update CPU usage metric
-		double cpuUsageValue = getProcessCpuLoad();
-		this.cpu.inc(cpuUsageValue);
+			/* Prometheus */
+			// Update CPU usage metric
+			double cpuUsageValue = getProcessCpuLoad();
+			this.cpu.inc(cpuUsageValue);
 
-		// Update memory metrics
-		long heapMemoryUsedValue = getHeapMemoryUsage().getUsed();
-		long nonHeapMemoryUsedValue = getNonHeapMemoryUsage().getUsed();
+			// Update memory metrics
+			long heapMemoryUsedValue = getHeapMemoryUsage().getUsed();
+			long nonHeapMemoryUsedValue = getNonHeapMemoryUsage().getUsed();
 
-		this.heapMemory.inc(heapMemoryUsedValue);
-		this.nonHeapMemory.inc(nonHeapMemoryUsedValue);
+			this.heapMemory.inc(heapMemoryUsedValue);
+			this.nonHeapMemory.inc(nonHeapMemoryUsedValue);
+		} finally {
+			span.finish();
+		}
 	}
 
 	protected void moveBrushTo(RoutingContext context) {
-		logger.log(Level.INFO, "MoveBrushTo request: " + context.currentRoute().getPath());
-		String brushId = context.pathParam("brushId");
-		logger.log(Level.INFO, "Brush id: " + brushId);
-		// context.body().asJsonObject();
-		context.request().handler(buf -> {
-			JsonObject brushInfo = buf.toJsonObject();
-			int x = brushInfo.getInteger("x");
-			int y = brushInfo.getInteger("y");
-			JsonObject reply = new JsonObject();
-			try {
-				pixelArtAPI.moveBrushTo(brushId, y, x);
-				sendReply(context.response(), reply);
-			} catch (Exception ex) {
-				sendServiceError(context.response());
-			}
-		});
-		sendLogRequest("[CooperativePixelArtService] - Terminated moveBrushTo!")
+		ScopedSpan span = this.tracer.startScopedSpan("moveBrushTo");
+		try {
+			logger.log(Level.INFO, "MoveBrushTo request: " + context.currentRoute().getPath());
+			String brushId = context.pathParam("brushId");
+			logger.log(Level.INFO, "Brush id: " + brushId);
+			// context.body().asJsonObject();
+			context.request().handler(buf -> {
+				JsonObject brushInfo = buf.toJsonObject();
+				int x = brushInfo.getInteger("x");
+				int y = brushInfo.getInteger("y");
+				JsonObject reply = new JsonObject();
+				try {
+					pixelArtAPI.moveBrushTo(brushId, y, x);
+					sendReply(context.response(), reply);
+				} catch (Exception ex) {
+					sendServiceError(context.response());
+				}
+			});
+			sendLogRequest("[CooperativePixelArtService] - Terminated moveBrushTo!")
 				.onComplete(logRes -> {
 					if (logRes.failed()) {
 						logger.log(Level.WARNING, "Errore durante l'invio del log: " + logRes.cause());
 					}
 				});
 
-		/* Prometheus */
-		// Update CPU usage metric
-		double cpuUsageValue = getProcessCpuLoad();
-		this.cpu.inc(cpuUsageValue);
+			/* Prometheus */
+			// Update CPU usage metric
+			double cpuUsageValue = getProcessCpuLoad();
+			this.cpu.inc(cpuUsageValue);
 
-		// Update memory metrics
-		long heapMemoryUsedValue = getHeapMemoryUsage().getUsed();
-		long nonHeapMemoryUsedValue = getNonHeapMemoryUsage().getUsed();
+			// Update memory metrics
+			long heapMemoryUsedValue = getHeapMemoryUsage().getUsed();
+			long nonHeapMemoryUsedValue = getNonHeapMemoryUsage().getUsed();
 
-		this.heapMemory.inc(heapMemoryUsedValue);
-		this.nonHeapMemory.inc(nonHeapMemoryUsedValue);
+			this.heapMemory.inc(heapMemoryUsedValue);
+			this.nonHeapMemory.inc(nonHeapMemoryUsedValue);
+		} finally {
+			span.finish();
+		}
 	}
 
 	protected void changeBrushColor(RoutingContext context) {
-		logger.log(Level.INFO, "ChangeBrushColor request: " + context.currentRoute().getPath());
-		String brushId = context.pathParam("brushId");
-		context.request().handler(buf -> {
-			JsonObject brushInfo = buf.toJsonObject();
-			logger.log(Level.INFO, "Body: " + brushInfo.encodePrettily());
-			int c = brushInfo.getInteger("color");
+		ScopedSpan span = this.tracer.startScopedSpan("changeBrushColor");
+		try {
+			logger.log(Level.INFO, "ChangeBrushColor request: " + context.currentRoute().getPath());
+			String brushId = context.pathParam("brushId");
+			context.request().handler(buf -> {
+				JsonObject brushInfo = buf.toJsonObject();
+				logger.log(Level.INFO, "Body: " + brushInfo.encodePrettily());
+				int c = brushInfo.getInteger("color");
+				JsonObject reply = new JsonObject();
+				try {
+					pixelArtAPI.changeBrushColor(brushId, c);
+					sendReply(context.response(), reply);
+				} catch (Exception ex) {
+					sendServiceError(context.response());
+				}
+			});
+			sendLogRequest("[CooperativePixelArtService] - Terminated changeBrushColor!")
+				.onComplete(logRes -> {
+					if (logRes.failed()) {
+						logger.log(Level.WARNING, "Errore durante l'invio del log: " + logRes.cause());
+					}
+				});
+
+			/* Prometheus */
+			// Update CPU usage metric
+			double cpuUsageValue = getProcessCpuLoad();
+			this.cpu.inc(cpuUsageValue);
+
+			// Update memory metrics
+			long heapMemoryUsedValue = getHeapMemoryUsage().getUsed();
+			long nonHeapMemoryUsedValue = getNonHeapMemoryUsage().getUsed();
+
+			this.heapMemory.inc(heapMemoryUsedValue);
+			this.nonHeapMemory.inc(nonHeapMemoryUsedValue);
+		} finally {
+			span.finish();
+		}
+	}
+
+	protected void selectPixel(RoutingContext context) {
+		ScopedSpan span = this.tracer.startScopedSpan("selectPixel");
+		try {
+			logger.log(Level.INFO, "SelectPixel request: " + context.currentRoute().getPath());
+			String brushId = context.pathParam("brushId");
 			JsonObject reply = new JsonObject();
 			try {
-				pixelArtAPI.changeBrushColor(brushId, c);
+				pixelArtAPI.selectPixel(brushId);
 				sendReply(context.response(), reply);
 			} catch (Exception ex) {
 				sendServiceError(context.response());
 			}
-		});
-		sendLogRequest("[CooperativePixelArtService] - Terminated changeBrushColor!")
+			sendLogRequest("[CooperativePixelArtService] - Terminated selectPixel!")
 				.onComplete(logRes -> {
 					if (logRes.failed()) {
 						logger.log(Level.WARNING, "Errore durante l'invio del log: " + logRes.cause());
 					}
 				});
 
-		/* Prometheus */
-		// Update CPU usage metric
-		double cpuUsageValue = getProcessCpuLoad();
-		this.cpu.inc(cpuUsageValue);
+			/* Prometheus */
+			// Update CPU usage metric
+			double cpuUsageValue = getProcessCpuLoad();
+			this.cpu.inc(cpuUsageValue);
 
-		// Update memory metrics
-		long heapMemoryUsedValue = getHeapMemoryUsage().getUsed();
-		long nonHeapMemoryUsedValue = getNonHeapMemoryUsage().getUsed();
+			// Update memory metrics
+			long heapMemoryUsedValue = getHeapMemoryUsage().getUsed();
+			long nonHeapMemoryUsedValue = getNonHeapMemoryUsage().getUsed();
 
-		this.heapMemory.inc(heapMemoryUsedValue);
-		this.nonHeapMemory.inc(nonHeapMemoryUsedValue);
-	}
-
-	protected void selectPixel(RoutingContext context) {
-		logger.log(Level.INFO, "SelectPixel request: " + context.currentRoute().getPath());
-		String brushId = context.pathParam("brushId");
-		JsonObject reply = new JsonObject();
-		try {
-			pixelArtAPI.selectPixel(brushId);
-			sendReply(context.response(), reply);
-		} catch (Exception ex) {
-			sendServiceError(context.response());
+			this.heapMemory.inc(heapMemoryUsedValue);
+			this.nonHeapMemory.inc(nonHeapMemoryUsedValue);
+		} finally {
+			span.finish();
 		}
-		sendLogRequest("[CooperativePixelArtService] - Terminated selectPixel!")
-				.onComplete(logRes -> {
-					if (logRes.failed()) {
-						logger.log(Level.WARNING, "Errore durante l'invio del log: " + logRes.cause());
-					}
-				});
-
-		/* Prometheus */
-		// Update CPU usage metric
-		double cpuUsageValue = getProcessCpuLoad();
-		this.cpu.inc(cpuUsageValue);
-
-		// Update memory metrics
-		long heapMemoryUsedValue = getHeapMemoryUsage().getUsed();
-		long nonHeapMemoryUsedValue = getNonHeapMemoryUsage().getUsed();
-
-		this.heapMemory.inc(heapMemoryUsedValue);
-		this.nonHeapMemory.inc(nonHeapMemoryUsedValue);
 	}
 
 	protected void destroyBrush(RoutingContext context) {
-		logger.log(Level.INFO, "Destroy Brush request: " + context.currentRoute().getPath());
-		String brushId = context.pathParam("brushId");
-		JsonObject reply = new JsonObject();
+		ScopedSpan span = this.tracer.startScopedSpan("destroyBrush");
 		try {
-			pixelArtAPI.destroyBrush(brushId);
-			sendReply(context.response(), reply);
-		} catch (Exception ex) {
-			sendServiceError(context.response());
-		}
-		sendLogRequest("[CooperativePixelArtService] - Terminated destroyBrush!")
+			logger.log(Level.INFO, "Destroy Brush request: " + context.currentRoute().getPath());
+			String brushId = context.pathParam("brushId");
+			JsonObject reply = new JsonObject();
+			try {
+				pixelArtAPI.destroyBrush(brushId);
+				sendReply(context.response(), reply);
+			} catch (Exception ex) {
+				sendServiceError(context.response());
+			}
+			sendLogRequest("[CooperativePixelArtService] - Terminated destroyBrush!")
 				.onComplete(logRes -> {
 					if (logRes.failed()) {
 						logger.log(Level.WARNING, "Errore durante l'invio del log: " + logRes.cause());
 					}
 				});
 
-		/* Prometheus */
-		// Update CPU usage metric
-		double cpuUsageValue = getProcessCpuLoad();
-		this.cpu.inc(cpuUsageValue);
+			/* Prometheus */
+			// Update CPU usage metric
+			double cpuUsageValue = getProcessCpuLoad();
+			this.cpu.inc(cpuUsageValue);
 
-		// Update memory metrics
-		long heapMemoryUsedValue = getHeapMemoryUsage().getUsed();
-		long nonHeapMemoryUsedValue = getNonHeapMemoryUsage().getUsed();
+			// Update memory metrics
+			long heapMemoryUsedValue = getHeapMemoryUsage().getUsed();
+			long nonHeapMemoryUsedValue = getNonHeapMemoryUsage().getUsed();
 
-		this.heapMemory.inc(heapMemoryUsedValue);
-		this.nonHeapMemory.inc(nonHeapMemoryUsedValue);
+			this.heapMemory.inc(heapMemoryUsedValue);
+			this.nonHeapMemory.inc(nonHeapMemoryUsedValue);
+		} finally {
+			span.finish();
+		}
 	}
 
 	protected void getPixelGridState(RoutingContext context) {
-		logger.log(Level.INFO, "Get Pixel Grid state request: " + context.currentRoute().getPath());
-		JsonObject reply = new JsonObject();
+		ScopedSpan span = this.tracer.startScopedSpan("getPixelGridState");
 		try {
-			JsonObject info = pixelArtAPI.getPixelGridState();
-			reply.put("pixelGrid", info);
-			sendReply(context.response(), reply);
-		} catch (Exception ex) {
-			sendServiceError(context.response());
-		}
-		sendLogRequest("[CooperativePixelArtService] - Terminated getPixelGridState!")
+			logger.log(Level.INFO, "Get Pixel Grid state request: " + context.currentRoute().getPath());
+			JsonObject reply = new JsonObject();
+			try {
+				JsonObject info = pixelArtAPI.getPixelGridState();
+				reply.put("pixelGrid", info);
+				sendReply(context.response(), reply);
+			} catch (Exception ex) {
+				sendServiceError(context.response());
+			}
+			sendLogRequest("[CooperativePixelArtService] - Terminated getPixelGridState!")
 				.onComplete(logRes -> {
 					if (logRes.failed()) {
 						logger.log(Level.WARNING, "Errore durante l'invio del log: " + logRes.cause());
 					}
 				});
 
-		/* Prometheus */
-		// Update CPU usage metric
-		double cpuUsageValue = getProcessCpuLoad();
-		this.cpu.inc(cpuUsageValue);
+			/* Prometheus */
+			// Update CPU usage metric
+			double cpuUsageValue = getProcessCpuLoad();
+			this.cpu.inc(cpuUsageValue);
 
-		// Update memory metrics
-		long heapMemoryUsedValue = getHeapMemoryUsage().getUsed();
-		long nonHeapMemoryUsedValue = getNonHeapMemoryUsage().getUsed();
+			// Update memory metrics
+			long heapMemoryUsedValue = getHeapMemoryUsage().getUsed();
+			long nonHeapMemoryUsedValue = getNonHeapMemoryUsage().getUsed();
 
-		this.heapMemory.inc(heapMemoryUsedValue);
-		this.nonHeapMemory.inc(nonHeapMemoryUsedValue);
+			this.heapMemory.inc(heapMemoryUsedValue);
+			this.nonHeapMemory.inc(nonHeapMemoryUsedValue);
+		} finally {
+			span.finish();
+		}
 	}
 
 	/* Handling subscribers using web sockets */
