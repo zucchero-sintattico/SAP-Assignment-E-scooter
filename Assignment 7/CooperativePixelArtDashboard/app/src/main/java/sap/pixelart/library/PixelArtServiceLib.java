@@ -1,5 +1,7 @@
 package sap.pixelart.library;
 
+import io.prometheus.metrics.core.metrics.Histogram;
+
 /**
  * 
  * Library for interacting with the PixelArt service
@@ -28,15 +30,9 @@ public class PixelArtServiceLib {
 		}
 	}
 	
-	public PixelArtAsyncAPI getDefaultInterface() {
+	public PixelArtAsyncAPI getDefaultInterface(Histogram histogram) {
 		PixelArtServiceProxy serviceProxy = new PixelArtServiceProxy();
-		serviceProxy.init(DEFAULT_HOST, DEFAULT_PORT);
-		return serviceProxy;
-	}
-	
-	public PixelArtAsyncAPI getHTTPInterface(String host, int port) {
-		PixelArtServiceProxy serviceProxy = new PixelArtServiceProxy();
-		serviceProxy.init(host, port);
+		serviceProxy.init(DEFAULT_HOST, DEFAULT_PORT, histogram);
 		return serviceProxy;
 	}
 	

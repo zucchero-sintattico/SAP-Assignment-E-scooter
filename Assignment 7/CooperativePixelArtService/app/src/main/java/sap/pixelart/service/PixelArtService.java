@@ -1,5 +1,6 @@
 package sap.pixelart.service;
 
+import io.prometheus.metrics.core.metrics.Gauge;
 import sap.pixelart.service.application.PixelArtServiceImpl;
 import sap.pixelart.service.infrastructure.RestPixelArtServiceController;
 
@@ -20,9 +21,9 @@ public class PixelArtService {
 		restAPIPort = port;
 	}
 	
-	public void launch() {
+	public void launch(Gauge cpu, Gauge heapMemory, Gauge nonHeapMemory) {
     	service.init();
 		restBasedAdapter = new RestPixelArtServiceController(restAPIPort);	    	
-    	restBasedAdapter.init(service);
+    	restBasedAdapter.init(service, cpu, heapMemory, nonHeapMemory);
 	}
 }

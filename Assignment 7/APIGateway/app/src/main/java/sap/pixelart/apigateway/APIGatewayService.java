@@ -1,5 +1,6 @@
 package sap.pixelart.apigateway;
 
+import io.prometheus.metrics.core.metrics.Counter;
 import sap.pixelart.apigateway.infrastructure.APIGatewayController;
 import sap.pixelart.library.PixelArtAsyncAPI;
 import sap.pixelart.library.PixelArtServiceLib;
@@ -20,8 +21,8 @@ public class APIGatewayService {
 		restAPIPort = port;
 	}
 	
-	public void launch() {
+	public void launch(Counter counter) {
         APIGatewayController restBasedAdapter = new APIGatewayController(restAPIPort);
-    	restBasedAdapter.init(service);
+    	restBasedAdapter.init(service, counter);
 	}
 }

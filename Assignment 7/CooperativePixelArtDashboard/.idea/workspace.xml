@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="3322ece3-e281-48d7-a7d9-8a13c3c527aa" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../APIGateway/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/../APIGateway/app/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../APIGateway/app/src/main/java/sap/pixelart/apigateway/APIGatewayService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../APIGateway/app/src/main/java/sap/pixelart/apigateway/APIGatewayService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../APIGateway/app/src/main/java/sap/pixelart/apigateway/APIGatewayServiceLauncher.java" beforeDir="false" afterPath="$PROJECT_DIR$/../APIGateway/app/src/main/java/sap/pixelart/apigateway/APIGatewayServiceLauncher.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../APIGateway/app/src/main/java/sap/pixelart/apigateway/infrastructure/APIGatewayController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../APIGateway/app/src/main/java/sap/pixelart/apigateway/infrastructure/APIGatewayController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../APIGateway/app/src/main/java/sap/pixelart/apigateway/infrastructure/APIGatewayControllerVerticle.java" beforeDir="false" afterPath="$PROJECT_DIR$/../APIGateway/app/src/main/java/sap/pixelart/apigateway/infrastructure/APIGatewayControllerVerticle.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/sap/pixelart/dashboard/PixelArtDashboardMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/sap/pixelart/dashboard/PixelArtDashboardMain.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/sap/pixelart/library/PixelArtServiceLib.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/sap/pixelart/library/PixelArtServiceLib.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/sap/pixelart/library/PixelArtServiceProxy.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/sap/pixelart/library/PixelArtServiceProxy.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../CooperativePixelArtService/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/../CooperativePixelArtService/app/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../CooperativePixelArtService/app/src/main/java/sap/pixelart/service/PixelArtService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../CooperativePixelArtService/app/src/main/java/sap/pixelart/service/PixelArtService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../CooperativePixelArtService/app/src/main/java/sap/pixelart/service/PixelArtServiceLauncher.java" beforeDir="false" afterPath="$PROJECT_DIR$/../CooperativePixelArtService/app/src/main/java/sap/pixelart/service/PixelArtServiceLauncher.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../CooperativePixelArtService/app/src/main/java/sap/pixelart/service/application/PixelArtServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../CooperativePixelArtService/app/src/main/java/sap/pixelart/service/application/PixelArtServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../CooperativePixelArtService/app/src/main/java/sap/pixelart/service/infrastructure/RestPixelArtServiceController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../CooperativePixelArtService/app/src/main/java/sap/pixelart/service/infrastructure/RestPixelArtServiceController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../CooperativePixelArtService/app/src/main/java/sap/pixelart/service/infrastructure/RestPixelArtServiceControllerVerticle.java" beforeDir="false" afterPath="$PROJECT_DIR$/../CooperativePixelArtService/app/src/main/java/sap/pixelart/service/infrastructure/RestPixelArtServiceControllerVerticle.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../prometheus.yml" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <projects_view>
+          <tree_state>
+            <expand>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="CooperativePixelArtDashboard" type="f1a62948:ProjectNode" />
+              </path>
+            </expand>
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+  </component>
+  <component name="ProjectCodeStyleSettingsMigration">
+    <option name="version" value="2" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
+  <component name="ProjectId" id="2nvIQmJV8DUWXkDwobLnaUL89Hx" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.PixelArtDashboardMain.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.CooperativePixelArtDashboard:app [:app:PixelArtDashboardMain.main()].executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/giacomototaro/Desktop/Università/Magistrale/II anno/I semestre/Software architecture &amp; platform/Progetti/SAP-Assignment-E-scooter/Assignment 7/CooperativePixelArtDashboard&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Global Libraries&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RunManager">
+    <configuration name="PixelArtDashboardMain" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="sap.pixelart.dashboard.PixelArtDashboardMain" />
+      <module name="CooperativePixelArtDashboard.app.main" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="sap.pixelart.dashboard.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.PixelArtDashboardMain" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9f38398b9061-39b83d9b5494-intellij.indexing.shared.core-IU-241.15989.150" />
+        <option value="bundled-js-predefined-1d06a55b98c1-91d5c284f522-JavaScript-IU-241.15989.150" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="3322ece3-e281-48d7-a7d9-8a13c3c527aa" name="Changes" comment="" />
+      <created>1729847108756</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1729847108756</updated>
+      <workItem from="1729847110051" duration="12320000" />
+      <workItem from="1730127817235" duration="1814000" />
+      <workItem from="1730129763276" duration="34000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

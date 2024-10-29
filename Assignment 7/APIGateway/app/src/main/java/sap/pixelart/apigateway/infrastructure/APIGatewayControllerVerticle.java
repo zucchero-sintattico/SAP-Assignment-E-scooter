@@ -2,6 +2,8 @@ package sap.pixelart.apigateway.infrastructure;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import io.prometheus.metrics.core.metrics.Counter;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.http.HttpMethod;
@@ -26,11 +28,13 @@ public class APIGatewayControllerVerticle extends AbstractVerticle implements Pi
 	private final PixelArtAsyncAPI serviceAPI;
 	static Logger logger = Logger.getLogger("[PixelArt Service]");
 	static String PIXEL_GRID_CHANNEL = "pixel-grid-events";
+	private final Counter counter;
 
-	public APIGatewayControllerVerticle(int port, PixelArtAsyncAPI serviceAPI) {
+	public APIGatewayControllerVerticle(int port, PixelArtAsyncAPI serviceAPI, Counter counter) {
 		this.port = port;
 		this.serviceAPI = serviceAPI;
 		logger.setLevel(Level.INFO);
+		this.counter = counter;
 	}
 
 	public void start() {
@@ -62,6 +66,7 @@ public class APIGatewayControllerVerticle extends AbstractVerticle implements Pi
 	/* List of handlers, mapping the API */
 	
 	protected void createBrush(RoutingContext context) {
+		this.counter.labelValues("POST", "/api/brushes", "success").inc();
 		logger.log(Level.INFO, "CreateBrush request - " + context.currentRoute().getPath());
 		JsonObject reply = new JsonObject();
 		serviceAPI
@@ -75,11 +80,13 @@ public class APIGatewayControllerVerticle extends AbstractVerticle implements Pi
 			}
 		})
 		.onFailure((e) -> {
-			sendServiceError(context.response());			
+			sendServiceError(context.response());
+			this.counter.labelValues("POST", "/api/brushes", "error").inc();
 		});
 	}
 
 	protected void getCurrentBrushes(RoutingContext context) {
+		this.counter.labelValues("GET", "/api/brushes", "success").inc();
 		logger.log(Level.INFO, "GetCurrentBrushes request - " + context.currentRoute().getPath());
 
 		JsonObject reply = new JsonObject();
@@ -94,11 +101,13 @@ public class APIGatewayControllerVerticle extends AbstractVerticle implements Pi
 			}
 		})
 		.onFailure((e) -> {
-			sendServiceError(context.response());			
+			sendServiceError(context.response());
+			this.counter.labelValues("GET", "/api/brushes", "error").inc();
 		});
 	}
 
 	protected void getBrushInfo(RoutingContext context) {
+		this.counter.labelValues("GET", "/api/brushes/:brushId", "success").inc();
 		logger.log(Level.INFO, "Get Brush info request: " + context.currentRoute().getPath());
 		String brushId = context.pathParam("brushId");
 		JsonObject reply = new JsonObject();
@@ -113,11 +122,13 @@ public class APIGatewayControllerVerticle extends AbstractVerticle implements Pi
 			}
 		})
 		.onFailure((e) -> {
-			sendServiceError(context.response());			
+			sendServiceError(context.response());
+			this.counter.labelValues("GET", "/api/brushes/:brushId", "error").inc();
 		});
 	}
 
 	protected void moveBrushTo(RoutingContext context) {
+		this.counter.labelValues("POST", "/api/brushes/:brushId/move-to", "success").inc();
 		logger.log(Level.INFO, "MoveBrushTo request: " + context.currentRoute().getPath());
 		String brushId = context.pathParam("brushId");
 		logger.log(Level.INFO, "Brush id: " + brushId);
@@ -134,6 +145,7 @@ public class APIGatewayControllerVerticle extends AbstractVerticle implements Pi
 					sendReply(context.response(), reply);
 				} catch (Exception ex) {
 					sendServiceError(context.response());
+					this.counter.labelValues("POST", "/api/brushes/:brushId/move-to", "error").inc();
 				}
 			})
 			.onFailure((e) -> {
@@ -143,6 +155,7 @@ public class APIGatewayControllerVerticle extends AbstractVerticle implements Pi
 	}
 
 	protected void changeBrushColor(RoutingContext context) {
+		this.counter.labelValues("POST", "/api/brushes/:brushId/change-color", "success").inc();
 		logger.log(Level.INFO, "ChangeBrushColor request: " + context.currentRoute().getPath());
 		String brushId = context.pathParam("brushId");
 		context.request().handler(buf -> {
@@ -160,12 +173,14 @@ public class APIGatewayControllerVerticle extends AbstractVerticle implements Pi
 				}
 			})
 			.onFailure((e) -> {
-				sendServiceError(context.response());			
+				sendServiceError(context.response());
+				this.counter.labelValues("POST", "/api/brushes/:brushId/change-color", "error").inc();
 			});
 		});
 	}
 
 	protected void selectPixel(RoutingContext context) {
+		this.counter.labelValues("POST", "/api/brushes/:brushId/select-pixel", "success").inc();
 		logger.log(Level.INFO, "SelectPixel request: " + context.currentRoute().getPath());
 		String brushId = context.pathParam("brushId");
 		JsonObject reply = new JsonObject();
@@ -179,11 +194,13 @@ public class APIGatewayControllerVerticle extends AbstractVerticle implements Pi
 			}
 		})
 		.onFailure((e) -> {
-			sendServiceError(context.response());			
+			sendServiceError(context.response());
+			this.counter.labelValues("POST", "/api/brushes/:brushId/select-pixel", "error").inc();
 		});
 	}
 
 	protected void destroyBrush(RoutingContext context) {
+		this.counter.labelValues("DELETE", "/api/brushes/:brushId", "success").inc();
 		logger.log(Level.INFO, "Destroy Brush request: " + context.currentRoute().getPath());
 		String brushId = context.pathParam("brushId");
 		JsonObject reply = new JsonObject();
@@ -197,11 +214,13 @@ public class APIGatewayControllerVerticle extends AbstractVerticle implements Pi
 			}
 		})
 		.onFailure((e) -> {
-			sendServiceError(context.response());			
+			sendServiceError(context.response());
+			this.counter.labelValues("DELETE", "/api/brushes/:brushId", "error").inc();
 		});
 	}
 
 	protected void getPixelGridState(RoutingContext context) {
+		this.counter.labelValues("GET", "/api/pixel-grid", "success").inc();
 		logger.log(Level.INFO, "Get Pixel Grid state request: " + context.currentRoute().getPath());
 		JsonObject reply = new JsonObject();
 		serviceAPI
@@ -215,7 +234,8 @@ public class APIGatewayControllerVerticle extends AbstractVerticle implements Pi
 			}
 		})
 		.onFailure((e) -> {
-			sendServiceError(context.response());			
+			sendServiceError(context.response());
+			this.counter.labelValues("GET", "/api/pixel-grid", "error").inc();
 		});
 	}
 
