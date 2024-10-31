@@ -95,7 +95,8 @@ public class RestPixelArtServiceControllerVerticle extends AbstractVerticle impl
 		Router router = Router.router(vertx);
 
 		/* configure the HTTP routes following a REST style */
-		
+		router.route(HttpMethod.GET, "/health").handler(this::checkHealth);
+
 		router.route(HttpMethod.POST, "/api/brushes").handler(this::createBrush);
 		router.route(HttpMethod.GET, "/api/brushes").handler(this::getCurrentBrushes);
 		router.route(HttpMethod.GET, "/api/brushes/:brushId").handler(this::getBrushInfo);
@@ -113,6 +114,50 @@ public class RestPixelArtServiceControllerVerticle extends AbstractVerticle impl
 		.listen(port);
 
 		logger.log(Level.INFO, "PixelArt Service ready - port: " + port);
+	}
+
+	private void checkHealth(RoutingContext routingContext) {
+		JsonObject status = new JsonObject();
+
+		boolean isCreateBrushSuccessful = executeHealthCheck(() -> createBrush(routingContext));
+		boolean isGetCurrentBrushesSuccessful = executeHealthCheck(() -> getCurrentBrushes(routingContext));
+		boolean isGetBrushInfoSuccessful = executeHealthCheck(() -> getBrushInfo(routingContext));
+		boolean isMoveBrushToSuccessful = executeHealthCheck(() -> moveBrushTo(routingContext));
+		boolean isChangeBrushColorSuccessful = executeHealthCheck(() -> changeBrushColor(routingContext));
+		boolean isSelectPixelSuccessful = executeHealthCheck(() -> selectPixel(routingContext));
+		boolean isDestroyBrushSuccessful = executeHealthCheck(() -> destroyBrush(routingContext));
+		boolean isGetPixelGridStateSuccessful = executeHealthCheck(() -> getPixelGridState(routingContext));
+
+		status.put("createBrush", isCreateBrushSuccessful);
+		status.put("getCurrentBrushes", isGetCurrentBrushesSuccessful);
+		status.put("getBrushInfo", isGetBrushInfoSuccessful);
+		status.put("moveBrushTo", isMoveBrushToSuccessful);
+		status.put("changeBrushColor", isChangeBrushColorSuccessful);
+		status.put("selectPixel", isSelectPixelSuccessful);
+		status.put("destroyBrush", isDestroyBrushSuccessful);
+		status.put("getPixelGridState", isGetPixelGridStateSuccessful);
+
+		boolean isSystemHealth = isCreateBrushSuccessful && isGetCurrentBrushesSuccessful && isGetBrushInfoSuccessful &&
+				isMoveBrushToSuccessful && isChangeBrushColorSuccessful && isSelectPixelSuccessful &&
+				isDestroyBrushSuccessful && isGetPixelGridStateSuccessful;
+
+		status.put("status", isSystemHealth ? "UP" : "DOWN");
+
+		logger.log(Level.INFO, "API HealthCheck request - " + routingContext.currentRoute().getPath());
+		logger.log(Level.INFO, "Body: " + status.encodePrettily());
+
+	}
+
+	private boolean executeHealthCheck(Runnable runnable) {
+		try {
+			runnable.run();
+			return true;
+		} catch (IllegalStateException e) {
+			return true;
+		} catch (Exception e) {
+			logger.log(Level.WARNING," Triggered the excepetion: " + e);
+			return false;
+		}
 	}
 
 	/* List of handlers, mapping the API */
