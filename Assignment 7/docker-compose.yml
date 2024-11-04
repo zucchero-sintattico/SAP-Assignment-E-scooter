@@ -11,6 +11,10 @@
 #
 # Note that this file is meant for learning Zipkin, not production deployments.
 
+volumes:
+  prometheus-data: {}
+  grafana-data: {}
+
 services:
   # The zipkin process services the UI, and also exposes a POST endpoint that
   # instrumentation can send trace data to.
@@ -27,4 +31,16 @@ services:
       - 9090:9090
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - ./grafana:/etc/grafana/provisioning/datasources
 
