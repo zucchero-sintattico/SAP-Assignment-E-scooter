@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contatore</title>
+</head>
+<body>
+    <p>Contatore: <span id="counter">0</span></p>
+
+    <script>
+        const socket = new WebSocket('ws://localhost:8080/websocket'); //crea un'istanza di oggetto WebSocket e si connette al server WebSocket
+
+        //Questo codice gestisce gli eventi di messaggio inviati dal server WebSocket. Quando il server invia un messaggio, 
+        //questa funzione viene chiamata. Il messaggio JSON ricevuto viene analizzato, e il valore del contatore viene estratto e 
+        //visualizzato nella pagina.
+        socket.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            const counterValue = data.counter;
+            document.getElementById('counter').textContent = counterValue;
+        };
+    </script>
+</body>
+</html>
