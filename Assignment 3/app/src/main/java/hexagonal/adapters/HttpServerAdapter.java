@@ -106,11 +106,12 @@ public class HttpServerAdapter extends AbstractVerticle implements ServerPort {
     }
 
     private void getDashboard(RoutingContext routingContext) {
+        String directoryPath = System.getProperty("user.dir") + "/app/resources/webroot/ride-dashboard.html";
         LOGGER.log(Level.INFO, "New dashboard request: " + routingContext.currentRoute().getPath());
         HttpServerResponse response = routingContext.response();
         response.putHeader("content-type", "text/html");
 
-        vertx.fileSystem().readFile("resources/webroot/ride-dashboard.html", result -> {
+        vertx.fileSystem().readFile(directoryPath, result -> {
             if (result.succeeded()) {
                 response.end(result.result());
             } else {
