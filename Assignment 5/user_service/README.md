@@ -13,13 +13,13 @@ This report provides an overview of the routes defined in the `UserServiceVertic
 
 ### 2. Login Page Route
 - **Method**: GET
-- **Path**: `/api/users/auth/login-form`
+- **Path**: `/api/users/login-form`
 - **Handler**: `AuthPageHandler`
 - **Description**: Handles requests to display the login page.
 
 ### 3. Registration Page Route
 - **Method**: GET
-- **Path**: `api/users/auth/register-form`
+- **Path**: `api/users/register-form`
 - **Handler**: `AuthPageHandler`
 - **Description**: Handles requests to display the registration form.
 
