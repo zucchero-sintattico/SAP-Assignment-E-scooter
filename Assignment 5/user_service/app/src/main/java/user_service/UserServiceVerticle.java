@@ -38,7 +38,7 @@ public class UserServiceVerticle extends AbstractVerticle {
             router.route(HttpMethod.GET, "/api/users/dashboard").handler(new HomeHandler()::handle);
 
             // Rotta per visualizzare la pagina di login
-            router.route(HttpMethod.GET, "/api/users/auth/login-form").handler(new AuthPageHandler(circuitBreaker, "/login.html")::handle);
+            router.route(HttpMethod.GET, "/api/users/login-form").handler(new AuthPageHandler(circuitBreaker, "/login.html")::handle);
 
             // Rotta per visualizzare la pagina di registrazione
             router.route(HttpMethod.GET, "/api/users/register-form").handler(new AuthPageHandler(circuitBreaker, "/registration.html")::handle);

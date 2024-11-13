@@ -10,8 +10,8 @@ import java.io.InputStreamReader;
 import java.util.stream.Collectors;
 
 public class AuthPageHandler implements IHandler{
-    private CircuitBreaker circuitBreaker;
-    private String htmlFilePath;
+    private final CircuitBreaker circuitBreaker;
+    private final String htmlFilePath;
 
     public AuthPageHandler(CircuitBreaker circuitBreaker, String htmlFilePath) {
         this.circuitBreaker = circuitBreaker;
